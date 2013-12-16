@@ -22,12 +22,15 @@
     return self;
 }
 
-- (id)initWithImage:(UIImage *)image
+- (id)initWithImage:(UIImage *)image withPlaceholder:(UIImageView *)placeholder
 {
     self = [super initWithImage:image];
     if (self) {
         // Initialization code
         [self setUserInteractionEnabled:YES];
+        
+        self.referenceView = [self superview];
+        self.placeholder = placeholder;
         
     }
     return self;
@@ -42,25 +45,9 @@
 }
 */
 
-//- (void)setupGamePieceToReferenceView:(UIView *)view {
-//    self.referenceView = view;
-//    
-//    _originalFrame = self.frame;
-//    _originalCenter = self.center;
-//    
-//    _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
-//    
-//    UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
-//    [self addGestureRecognizer:pinchGestureRecognizer];
-//    
-////    UIRotationGestureRecognizer *rotationGestureRecognizer = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotate:)];
-////    [self addGestureRecognizer:rotationGestureRecognizer];
-//}
-
 - (void)makeGamePieceDraggable {
     self.draggable = YES;
-    
-    self.referenceView = [self superview];
+    self.tappable = NO;
     
     _originalFrame = self.frame;
     _originalCenter = self.center;
@@ -70,8 +57,12 @@
     UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
     [self addGestureRecognizer:pinchGestureRecognizer];
     
-//    UIRotationGestureRecognizer *rotationGestureRecognizer = [[UIRotationGestureRecognizer alloc] initWithTarget:self action:@selector(handleRotate:)];
-//    [self addGestureRecognizer:rotationGestureRecognizer];
+//    [self.referenceView bringSubviewToFront:self];
+}
+
+- (void)makeGamePieceTappable {
+    self.tappable = YES;
+    self.draggable = NO;
 }
 
 #pragma mark - UITouch Methods
@@ -79,11 +70,7 @@
 {
     [super touchesBegan:touches withEvent:event];
     
-    if (!self.draggable)
-        return;
-    
     UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self.referenceView];
     
     // Only accept the touch if it is on a non transparent pixel of the image
     if ([self isTouchOnTransparentPixel:[touch locationInView:self]]) {
@@ -92,74 +79,38 @@
     }
     else {
         _didTouchTransparentPixel = NO;
-        
-        // Make the piece slightly transparent
-        [self makeTransparent:YES];
     }
     
-    [_animator removeAllBehaviors];
-    
-    // We only zoom in on the first touch of the piece when it is first selected
-    if (!_isScaled) {
-        [self zoomGamePieceIn];
-        _isScaled = YES;
-    }
-    
-    // Retrieve the touch point
-    CGPoint point = [[touches anyObject] locationInView:self];
-    _startLocation = point;
-    
-    // Tell the view controller that the game piece has been selected
-    [self.delegate gamePieceTouchBegan:self didTouchAtPoint:touchLocation];
+    if (self.draggable)
+        [self draggableGamePieceTouchesBegan:touches withEvent:event];
+    else if (self.tappable)
+        [self tappableGamePieceTouchesBegan:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesMoved:touches withEvent:event];
     
-    if (!self.draggable)
-        return;
-    
     if (_didTouchTransparentPixel)
         return;
     
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self.referenceView];
-    
-    // We only move the game piece when one finger is touching it.
-    // This prevents the game piece from jumping around the screen when
-    // a second finger touches down to perform the pinch scalling.
-    if ([[event allTouches] count] == 1) {
-        // Move relative to the original touch point
-        CGPoint point = [[touches anyObject] locationInView:self];
-        CGRect frame = [self frame];
-        frame.origin.x += point.x - _startLocation.x;
-        frame.origin.y += point.y - _startLocation.y;
-        [self setFrame:frame];
-    }
-    
-    // Tell the view controller that the game piece has been moved
-    [self.delegate gamePiece:self didDragToPoint:touchLocation];
+    if (self.draggable)
+        [self draggableGamePieceTouchesMoved:touches withEvent:event];
+    else if (self.tappable)
+        [self tappableGamePieceTouchesMoved:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesEnded:touches withEvent:event];
     
-    if (!self.draggable)
-        return;
-    
     if (_didTouchTransparentPixel)
         return;
     
-    // Remove the transparency
-    [self makeTransparent:NO];
-    
-    UITouch *touch = [[event allTouches] anyObject];
-    CGPoint touchLocation = [touch locationInView:self.referenceView];
-    
-    // Tell the view controller that the game piece has been released
-    [self.delegate gamePiece:self didReleaseAtPoint:touchLocation];
+    if (self.draggable)
+        [self draggableGamePieceTouchesEnded:touches withEvent:event];
+    else if (self.tappable)
+        [self tappableGamePieceTouchesEnded:touches withEvent:event];
 }
 
 #pragma mark - UIGestureRecognizer Methods
@@ -188,12 +139,7 @@
     }
 }
 
-//- (void)handleRotate:(UIRotationGestureRecognizer *)recognizer {
-//    recognizer.view.transform = CGAffineTransformRotate(recognizer.view.transform, recognizer.rotation);
-//    recognizer.rotation = 0;
-//}
-
-#pragma mark - Instance Methods
+#pragma mark - Common Instance Methods
 - (BOOL)isTouchOnTransparentPixel:(CGPoint)point {
     unsigned char pixel[4] = {0};
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -250,6 +196,142 @@
                      }];
 }
 
+- (void)shakeGamePiece {
+    [self setHidden:YES];
+    
+    [UIView animateWithDuration:0.125
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, -20.0f, 0.0f);
+                     }
+                     completion:^(BOOL finished){
+                         [UIView animateWithDuration:0.125
+                                               delay:0.0
+                                             options:UIViewAnimationOptionCurveEaseInOut
+                                          animations:^{
+                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 40.0f, 0.0f);
+                                          }
+                                          completion:^(BOOL finished){
+                                              [UIView animateWithDuration:0.125
+                                                                    delay:0.0
+                                                                  options:UIViewAnimationOptionCurveEaseInOut
+                                                               animations:^{
+                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, -40.0f, 0.0f);
+                                                               }
+                                                               completion:^(BOOL finished){
+                                                                   [UIView animateWithDuration:0.125
+                                                                                         delay:0.0
+                                                                                       options:UIViewAnimationOptionCurveEaseInOut
+                                                                                    animations:^{
+                                                                                        self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 20.0f, 0.0f);
+                                                                                    }
+                                                                                    completion:^(BOOL finished){
+                                                                                        [self setHidden:NO];
+                                                                                    }];
+                                                               }];
+                                          }];
+                     }];
+}
+
+- (void)bounceGamePiece {
+    [UIView animateWithDuration:0.125
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -20.0f);
+                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -20.0f);
+                     }
+                     completion:^(BOOL finished){
+                         [UIView animateWithDuration:0.125
+                                               delay:0.0
+                                             options:UIViewAnimationOptionCurveEaseInOut
+                                          animations:^{
+                                              self.transform = CGAffineTransformTranslate(self.transform, 0.0f, 40.0f);
+                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 40.0f);
+                                          }
+                                          completion:^(BOOL finished){
+                                              [UIView animateWithDuration:0.125
+                                                                    delay:0.0
+                                                                  options:UIViewAnimationOptionCurveEaseInOut
+                                                               animations:^{
+                                                                   self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -40.0f);
+                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -40.0f);
+                                                               }
+                                                               completion:^(BOOL finished){
+                                                                   [UIView animateWithDuration:0.125
+                                                                                         delay:0.0
+                                                                                       options:UIViewAnimationOptionCurveEaseInOut
+                                                                                    animations:^{
+                                                                                        self.transform = CGAffineTransformTranslate(self.transform, 0.0f, 20.0f);
+                                                                                        self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 20.0f);
+                                                                                    }
+                                                                                    completion:^(BOOL finished){
+                                                                                        
+                                                                                    }];
+                                                               }];
+                                          }];
+                     }];
+}
+
+#pragma mark - Draggable Instance Methods
+- (void)draggableGamePieceTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+        
+    // Make the piece slightly transparent
+    [self makeTransparent:YES];
+    
+    [_animator removeAllBehaviors];
+    
+    // We only zoom in on the first touch of the piece when it is first selected
+    if (!_isScaled) {
+        [self zoomGamePieceIn];
+        _isScaled = YES;
+    }
+    
+    // Retrieve the touch point
+    CGPoint point = [[touches anyObject] locationInView:self];
+    _startLocation = point;
+    
+    // Tell the view controller that the game piece has been selected
+    [self.delegate draggableGamePieceTouchBegan:self didTouchAtPoint:touchLocation];
+}
+
+- (void)draggableGamePieceTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+    
+    // We only move the game piece when one finger is touching it.
+    // This prevents the game piece from jumping around the screen when
+    // a second finger touches down to perform the pinch scalling.
+    if ([[event allTouches] count] == 1) {
+        // Move relative to the original touch point
+        CGPoint point = [[touches anyObject] locationInView:self];
+        CGRect frame = [self frame];
+        frame.origin.x += point.x - _startLocation.x;
+        frame.origin.y += point.y - _startLocation.y;
+        [self setFrame:frame];
+    }
+    
+    // Tell the view controller that the game piece has been moved
+    [self.delegate draggableGamePiece:self didDragToPoint:touchLocation];
+}
+
+- (void)draggableGamePieceTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+    
+    // Remove the transparency
+    [self makeTransparent:NO];
+    
+    // Tell the view controller that the game piece has been released
+    [self.delegate draggableGamePiece:self didReleaseAtPoint:touchLocation];
+}
+
 - (void)returnGamePieceToOriginalLocation {
     if(!self.draggable)
         return;
@@ -267,23 +349,51 @@
                               delay:0.0
                             options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
-                             self.frame = self.targetFrameOnMap;
-                             
-                             [self.referenceView sendSubviewToBack:self];
+                             self.frame = self.placeholder.frame;
                          }
                          completion:^(BOOL finished){
                              [_animator removeAllBehaviors];
                          }];
     }
     else {
-        self.frame = self.targetFrameOnMap;
-        
-        [self.referenceView sendSubviewToBack:self];
+        self.frame = self.placeholder.frame;
         
         [_animator removeAllBehaviors];
     }
 }
 
+#pragma mark - Draggable Instance Methods
+- (void)tappableGamePieceTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+    
+    // Tell the view controller that the game piece has been selected
+    [self.delegate tappableGamePieceTouchBegan:self didTouchAtPoint:touchLocation];
+}
+
+- (void)tappableGamePieceTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+    
+    // Tell the view controller that the game piece has been moved
+    [self.delegate tappableGamePiece:self didDragToPoint:touchLocation];
+}
+
+- (void)tappableGamePieceTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.referenceView];
+    
+//    [self shakeGamePiece];
+    [self bounceGamePiece];
+    
+    // Tell the view controller that the game piece has been released
+    [self.delegate tappableGamePiece:self didReleaseAtPoint:touchLocation];
+}
+
+#pragma mark - TEMP Methods
 - (void)reset {
     [_animator removeAllBehaviors];
     _isScaled = NO;

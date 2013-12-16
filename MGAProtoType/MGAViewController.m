@@ -61,9 +61,9 @@
     self.iv_northKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_NorthKorea.png"]];
     self.iv_japanPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_Japan.png"]];
     
-    self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"]];
-    self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"]];
-    self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"]];
+    self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"] withPlaceholder:self.iv_southKoreaPlaceholder];
+    self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"] withPlaceholder:self.iv_northKoreaPlaceholder];
+    self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"] withPlaceholder:self.iv_japanPlaceholder];
     
     
     // Setup the various frames required for the map pieces for use throughout the stage
@@ -120,12 +120,6 @@
     [self.lbl_instruction setFont:[UIFont boldSystemFontOfSize:36.0f]];
     [self.view addSubview:self.lbl_instruction];
     
-//    // Animate the view into the screen coming up from the bottom, then disappearing again.
-//    void (^nextStep)(void) = ^(void) {
-//        [self setupStep1];
-//    };
-//    
-//    [self showInstructionWithText:_instruction completion:nextStep];
     [self startStep1];
 }
 
@@ -303,6 +297,10 @@
                          self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
                          self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
                          self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
+                         
+                         [self.view bringSubviewToFront:self.iv_southKoreaGamePiece];
+                         [self.view bringSubviewToFront:self.iv_northKoreaGamePiece];
+                         [self.view bringSubviewToFront:self.iv_japanGamePiece];
                      }
                      completion:^(BOOL finished){
                          [self setupGamePiecesForDragging];
@@ -314,20 +312,14 @@
 - (void)setupGamePiecesForDragging {
     [self.iv_southKoreaGamePiece makeGamePieceDraggable];
     self.iv_southKoreaGamePiece.delegate = self;
-    self.iv_southKoreaGamePiece.targetCenterOnMap = self.iv_southKoreaPlaceholder.center;
-    self.iv_southKoreaGamePiece.targetFrameOnMap = _southKoreaPlaceholderFrameOnMap;
     _maxDistanceFromCenter = 50.0f;
     
     [self.iv_northKoreaGamePiece makeGamePieceDraggable];
     self.iv_northKoreaGamePiece.delegate = self;
-    self.iv_northKoreaGamePiece.targetCenterOnMap = self.iv_northKoreaPlaceholder.center;
-    self.iv_northKoreaGamePiece.targetFrameOnMap = _northKoreaPlaceholderFrameOnMap;
     _maxDistanceFromCenter = 50.0f;
     
     [self.iv_japanGamePiece makeGamePieceDraggable];
     self.iv_japanGamePiece.delegate = self;
-    self.iv_japanGamePiece.targetCenterOnMap = self.iv_japanPlaceholder.center;
-    self.iv_japanGamePiece.targetFrameOnMap = _japanPlaceholderFrameOnMap;
     _maxDistanceFromCenter = 50.0f;
 }
 
@@ -336,17 +328,17 @@
 
 
 
-#pragma mark - MGAGamePieceDelegate Methods
-- (void)gamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point {
+#pragma mark - MGAGamePieceDelegate Draggable Game Piece Methods
+- (void)draggableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point {
+    [self.view bringSubviewToFront:gamePiece];
+}
+
+- (void)draggableGamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point {
     
 }
 
-- (void)gamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point {
-    
-}
-
-- (void)gamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
-    CGPoint p1 = gamePiece.targetCenterOnMap;
+- (void)draggableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
+    CGPoint p1 = gamePiece.placeholder.center;
     CGPoint p2 = gamePiece.center;
     
     CGFloat targetDistance = _maxDistanceFromCenter;
@@ -356,14 +348,33 @@
     if (distanceCenters <= targetDistance) {
         [gamePiece placeGamePieceOnMapTarget:YES];
         
+        [self.view sendSubviewToBack:gamePiece.placeholder];
+        [self.view sendSubviewToBack:gamePiece];
+        
         // Disable further interation with the game piece
-        [gamePiece setUserInteractionEnabled:NO];
+//        [gamePiece setUserInteractionEnabled:NO];
+        [gamePiece makeGamePieceTappable];
+        
     }
     else {
         [gamePiece returnGamePieceToOriginalLocation];
     }
 }
 
+#pragma mark - MGAGamePieceDelegate Tappable Game Piece Methods
+- (void)tappableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point {
+    
+}
+
+- (void)tappableGamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point {
+    
+}
+
+- (void)tappableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
+    
+}
+
+#pragma mark - Navigation Methods
 - (IBAction)onResetButtonPressed:(id)sender {
     [self.iv_japanGamePiece reset];
     [self.iv_northKoreaGamePiece reset];

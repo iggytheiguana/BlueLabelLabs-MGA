@@ -12,9 +12,13 @@
 
 @protocol MGAGamePieceDelegate <NSObject>
 @required
-- (void)gamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point;
-- (void)gamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point;
-- (void)gamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point;
+- (void)draggableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point;
+- (void)draggableGamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point;
+- (void)draggableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point;
+
+- (void)tappableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point;
+- (void)tappableGamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point;
+- (void)tappableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point;
 @end
 
 @interface MGAGamePiece : UIImageView < UIGestureRecognizerDelegate > {
@@ -35,15 +39,16 @@
 @property (weak, nonatomic) id <MGAGamePieceDelegate> delegate;
 
 @property (nonatomic, strong) UIView *referenceView;
+@property (nonatomic, strong) UIImageView *placeholder;
 @property (nonatomic) CGPoint targetCenterOnMap;
 @property (nonatomic) CGRect targetFrameOnMap;
 @property (nonatomic, assign) BOOL draggable;
 @property (nonatomic, assign) BOOL tappable;
 
 - (id)initWithFrame:(CGRect)frame;
-- (id)initWithImage:(UIImage *)image;
+- (id)initWithImage:(UIImage *)image withPlaceholder:(UIImageView *)placeholder;
+- (void)makeGamePieceTappable;
 - (void)makeGamePieceDraggable;
-//- (void)setupGamePieceToReferenceView:(UIView *)view;
 - (void)returnGamePieceToOriginalLocation;
 - (void)placeGamePieceOnMapTarget:(BOOL)animated;
 - (void)reset;
