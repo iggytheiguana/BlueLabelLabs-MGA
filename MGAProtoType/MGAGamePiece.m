@@ -18,6 +18,8 @@
         // Initialization code
         [self setUserInteractionEnabled:YES];
         
+        self.referenceView = [self superview];
+        
     }
     return self;
 }
@@ -29,7 +31,6 @@
         // Initialization code
         [self setUserInteractionEnabled:YES];
         
-        self.referenceView = [self superview];
         self.placeholder = placeholder;
         
     }
@@ -56,13 +57,19 @@
     
     UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
     [self addGestureRecognizer:pinchGestureRecognizer];
-    
-//    [self.referenceView bringSubviewToFront:self];
 }
 
-- (void)makeGamePieceTappable {
+- (void)makeGamePieceTappableWithCenter:(CGPoint)center {
     self.tappable = YES;
     self.draggable = NO;
+    
+    _originalFrame = self.frame;
+    _originalCenter = center;
+    
+    _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
+    _snapBehavior = [[UISnapBehavior alloc] initWithItem:self snapToPoint:_originalCenter];
+    _snapBehavior.damping = 1.25;
+    [_animator addBehavior:_snapBehavior];
 }
 
 #pragma mark - UITouch Methods
@@ -197,37 +204,43 @@
 }
 
 - (void)shakeGamePiece {
-    [self setHidden:YES];
+//    [self setHidden:YES];
+    
+    UIImage *originalImage = self.image;
+    self.image = self.placeholder.image;
     
     [UIView animateWithDuration:0.125
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
-                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, -20.0f, 0.0f);
+                         self.transform = CGAffineTransformTranslate(self.transform, -20.0f, 0.0f);
                      }
                      completion:^(BOOL finished){
                          [UIView animateWithDuration:0.125
                                                delay:0.0
                                              options:UIViewAnimationOptionCurveEaseInOut
                                           animations:^{
-                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 40.0f, 0.0f);
+                                              self.transform = CGAffineTransformTranslate(self.transform, 40.0f, 0.0f);
                                           }
                                           completion:^(BOOL finished){
                                               [UIView animateWithDuration:0.125
                                                                     delay:0.0
                                                                   options:UIViewAnimationOptionCurveEaseInOut
                                                                animations:^{
-                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, -40.0f, 0.0f);
+                                                                   self.transform = CGAffineTransformTranslate(self.transform, -40.0f, 0.0f);
                                                                }
                                                                completion:^(BOOL finished){
                                                                    [UIView animateWithDuration:0.125
                                                                                          delay:0.0
                                                                                        options:UIViewAnimationOptionCurveEaseInOut
                                                                                     animations:^{
-                                                                                        self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 20.0f, 0.0f);
+                                                                                        self.transform = CGAffineTransformIdentity;
                                                                                     }
                                                                                     completion:^(BOOL finished){
-                                                                                        [self setHidden:NO];
+//                                                                                        [self setHidden:NO];
+                                                                                        self.image = originalImage;
+                                                                                        
+                                                                                        [self.delegate gamePieceShakeDidComplete:self];
                                                                                     }];
                                                                }];
                                           }];
@@ -263,11 +276,11 @@
                                                                                          delay:0.0
                                                                                        options:UIViewAnimationOptionCurveEaseInOut
                                                                                     animations:^{
-                                                                                        self.transform = CGAffineTransformTranslate(self.transform, 0.0f, 20.0f);
-                                                                                        self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 20.0f);
+                                                                                        self.transform = CGAffineTransformIdentity;
+                                                                                        self.placeholder.transform = CGAffineTransformIdentity;
                                                                                     }
                                                                                     completion:^(BOOL finished){
-                                                                                        
+                                                                                        [self.delegate gamePieceBounceDidComplete:self];
                                                                                     }];
                                                                }];
                                           }];
@@ -344,11 +357,14 @@
 }
 
 - (void)placeGamePieceOnMapTarget:(BOOL)animated {
+    _isScaled = NO;
+    
     if (animated) {
         [UIView animateWithDuration:0.25
                               delay:0.0
                             options:UIViewAnimationOptionCurveEaseInOut
                          animations:^{
+                             self.transform = CGAffineTransformIdentity;
                              self.frame = self.placeholder.frame;
                          }
                          completion:^(BOOL finished){
@@ -356,6 +372,7 @@
                          }];
     }
     else {
+        self.transform = CGAffineTransformIdentity;
         self.frame = self.placeholder.frame;
         
         [_animator removeAllBehaviors];
@@ -385,9 +402,6 @@
 {
     UITouch *touch = [[event allTouches] anyObject];
     CGPoint touchLocation = [touch locationInView:self.referenceView];
-    
-//    [self shakeGamePiece];
-    [self bounceGamePiece];
     
     // Tell the view controller that the game piece has been released
     [self.delegate tappableGamePiece:self didReleaseAtPoint:touchLocation];

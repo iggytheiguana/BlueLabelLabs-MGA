@@ -62,8 +62,11 @@
     self.iv_japanPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_Japan.png"]];
     
     self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"] withPlaceholder:self.iv_southKoreaPlaceholder];
+    self.iv_southKoreaGamePiece.delegate = self;
     self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"] withPlaceholder:self.iv_northKoreaPlaceholder];
+    self.iv_northKoreaGamePiece.delegate = self;
     self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"] withPlaceholder:self.iv_japanPlaceholder];
+    self.iv_japanGamePiece.delegate = self;
     
     
     // Setup the various frames required for the map pieces for use throughout the stage
@@ -252,12 +255,12 @@
 }
 
 - (void)startStep1 {
-    // Of every game piece we create a completion block that will instruct
+    // For every game piece we create a completion block that will instruct
     // the view control to introduce the next game piece. The last game piece
     // has no completion handler.
     
     void (^nextStep)(void) = ^(void) {
-        [self startStep3];
+        [self endStep1];
     };
     
     void (^showJapan)(void) = ^(void) {
@@ -284,9 +287,64 @@
                   completion:showSouthKorea];
 }
 
+- (void)endStep1 {
+    // Fade out the current view to prepare fro step 2.
+    [UIView animateWithDuration:0.35
+                          delay:1.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.iv_map.alpha = 0.0f;
+                         
+                         for (MGAGamePiece *gamePiece in _gamePieceArray) {
+                             gamePiece.alpha = 0.0f;
+                         }
+                         
+                         for (UIImageView *placeholder in _placeholderArray) {
+                             placeholder.alpha = 0.0f;
+                         }
+                     }
+                     completion:^(BOOL finished){
+                         [self startStep2];
+                     }];
+}
 
 #pragma mark - Step 2 (Taping - No Map) Instance Methods
-
+- (void)startStep2 {
+    // Move the game pieces to the top off the screen, off the screen
+    // so they can drop into place to begin the next step.
+    
+    self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
+    self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
+    self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
+    
+    self.iv_southKoreaGamePiece.center = CGPointMake(170.0f, -384.0f);
+    self.iv_northKoreaGamePiece.center = CGPointMake(510.0f, -384.0f);
+    self.iv_japanGamePiece.center = CGPointMake(850.0f, -384.0f);
+    
+    self.iv_southKoreaGamePiece.alpha = 1.0f;
+    self.iv_northKoreaGamePiece.alpha = 1.0f;
+    self.iv_japanGamePiece.alpha = 1.0f;
+    
+    [self.iv_southKoreaGamePiece setUserInteractionEnabled:NO];
+    [self.iv_northKoreaGamePiece setUserInteractionEnabled:NO];
+    [self.iv_japanGamePiece setUserInteractionEnabled:NO];
+    
+    [self.iv_southKoreaGamePiece makeGamePieceTappableWithCenter:CGPointMake(170.0f, 384.0f)];
+    [self.iv_northKoreaGamePiece makeGamePieceTappableWithCenter:CGPointMake(510.0f, 384.0f)];
+    [self.iv_japanGamePiece makeGamePieceTappableWithCenter:CGPointMake(850.0f, 384.0f)];
+    
+    [self.view bringSubviewToFront:self.iv_southKoreaGamePiece];
+    [self.view bringSubviewToFront:self.iv_northKoreaGamePiece];
+    [self.view bringSubviewToFront:self.iv_japanGamePiece];
+    
+    void (^enableGamePieces)(void) = ^(void) {
+        [self.iv_southKoreaGamePiece setUserInteractionEnabled:YES];
+        [self.iv_northKoreaGamePiece setUserInteractionEnabled:YES];
+        [self.iv_japanGamePiece setUserInteractionEnabled:YES];
+    };
+    
+    [self showInstructionWithText:@"Show me South Korea" completion:enableGamePieces];
+}
 
 #pragma mark - Step 3 (Dragging - On Map) Instance Methods
 - (void)startStep3 {
@@ -294,9 +352,23 @@
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
+                         self.iv_map.alpha = 1.0f;
+                         
+                         for (MGAGamePiece *gamePiece in _gamePieceArray) {
+                             gamePiece.alpha = 1.0f;
+                         }
+                         
+                         for (UIImageView *placeholder in _placeholderArray) {
+                             placeholder.alpha = 1.0f;
+                         }
+                         
                          self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
                          self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
                          self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
+                         
+                         self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
+                         self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
+                         self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
                          
                          [self.view bringSubviewToFront:self.iv_southKoreaGamePiece];
                          [self.view bringSubviewToFront:self.iv_northKoreaGamePiece];
@@ -311,21 +383,22 @@
 
 - (void)setupGamePiecesForDragging {
     [self.iv_southKoreaGamePiece makeGamePieceDraggable];
-    self.iv_southKoreaGamePiece.delegate = self;
     _maxDistanceFromCenter = 50.0f;
     
     [self.iv_northKoreaGamePiece makeGamePieceDraggable];
-    self.iv_northKoreaGamePiece.delegate = self;
     _maxDistanceFromCenter = 50.0f;
     
     [self.iv_japanGamePiece makeGamePieceDraggable];
-    self.iv_japanGamePiece.delegate = self;
     _maxDistanceFromCenter = 50.0f;
 }
 
 
 #pragma mark - Step 4 (Taping - On Map) Instance Methods
-
+- (void)startStep4 {
+    // Game pieces should now be in their proper postions on the map.
+    // Make them tappable for this step.
+    
+}
 
 
 #pragma mark - MGAGamePieceDelegate Draggable Game Piece Methods
@@ -352,13 +425,19 @@
         [self.view sendSubviewToBack:gamePiece];
         
         // Disable further interation with the game piece
-//        [gamePiece setUserInteractionEnabled:NO];
-        [gamePiece makeGamePieceTappable];
-        
+        [gamePiece setUserInteractionEnabled:NO];
     }
     else {
         [gamePiece returnGamePieceToOriginalLocation];
     }
+}
+
+- (void)gamePiecePlacedOnTarget:(MGAGamePiece *)gamePiece {
+    [self startStep4];
+}
+
+- (void)gamePieceReturnedToOriginalLocation:(MGAGamePiece *)gamePiece {
+    
 }
 
 #pragma mark - MGAGamePieceDelegate Tappable Game Piece Methods
@@ -371,6 +450,19 @@
 }
 
 - (void)tappableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
+    if (gamePiece == self.iv_southKoreaGamePiece) {
+        [gamePiece bounceGamePiece];
+    }
+    else {
+        [gamePiece shakeGamePiece];
+    }
+}
+
+- (void)gamePieceBounceDidComplete:(MGAGamePiece *)gamePiece {
+    [self startStep3];
+}
+
+- (void)gamePieceShakeDidComplete:(MGAGamePiece *)gamePiece {
     
 }
 

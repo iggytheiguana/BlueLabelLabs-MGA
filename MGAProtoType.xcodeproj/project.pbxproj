@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		52170EC51860FD1A0096C7A5 /* MGAPropertyList.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC41860FD1A0096C7A5 /* MGAPropertyList.plist */; };
 		524AB6B1183592ED00E84DC1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B0183592ED00E84DC1 /* Foundation.framework */; };
 		524AB6B3183592ED00E84DC1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B2183592ED00E84DC1 /* CoreGraphics.framework */; };
 		524AB6B5183592ED00E84DC1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B4183592ED00E84DC1 /* UIKit.framework */; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		52170EC41860FD1A0096C7A5 /* MGAPropertyList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = MGAPropertyList.plist; sourceTree = "<group>"; };
 		524AB6AD183592ED00E84DC1 /* MGAProtoType.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MGAProtoType.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		524AB6B0183592ED00E84DC1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		524AB6B2183592ED00E84DC1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -110,6 +112,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		52170EC31860FCD90096C7A5 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				52170EC41860FD1A0096C7A5 /* MGAPropertyList.plist */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		524AB6A4183592ED00E84DC1 = {
 			isa = PBXGroup;
 			children = (
@@ -144,6 +154,7 @@
 		524AB6B6183592ED00E84DC1 /* MGAProtoType */ = {
 			isa = PBXGroup;
 			children = (
+				52170EC31860FCD90096C7A5 /* Model */,
 				524AB6F21835999D00E84DC1 /* Views */,
 				524AB6BF183592ED00E84DC1 /* MGAAppDelegate.h */,
 				524AB6C0183592ED00E84DC1 /* MGAAppDelegate.m */,
@@ -303,6 +314,7 @@
 				524AB6C9183592ED00E84DC1 /* Images.xcassets in Resources */,
 				52F608791852A49800AD8943 /* stage1_placeholder_Japan@2x.png in Resources */,
 				52F608711852A49800AD8943 /* stage1_gamepiece_Japan@2x.png in Resources */,
+				52170EC51860FD1A0096C7A5 /* MGAPropertyList.plist in Resources */,
 				52F6087A1852A49800AD8943 /* stage1_placeholder_NorthKorea.png in Resources */,
 				52F608771852A49800AD8943 /* stage1_map@2x.png in Resources */,
 				52F608741852A49800AD8943 /* stage1_gamepiece_SouthKorea.png in Resources */,
