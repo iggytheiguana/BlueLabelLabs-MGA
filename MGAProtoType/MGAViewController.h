@@ -11,7 +11,6 @@
 
 @interface MGAViewController : UIViewController < MGAGamePieceDelegate >
 
-- (IBAction)onResetButtonPressed:(id)sender;
 - (IBAction)onBackButtonPressed:(id)sender;
 
 @end

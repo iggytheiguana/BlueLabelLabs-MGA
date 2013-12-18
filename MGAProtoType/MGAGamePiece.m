@@ -24,14 +24,12 @@
     return self;
 }
 
-- (id)initWithImage:(UIImage *)image withPlaceholder:(UIImageView *)placeholder
+- (id)initWithImage:(UIImage *)image
 {
     self = [super initWithImage:image];
     if (self) {
         // Initialization code
         [self setUserInteractionEnabled:YES];
-        
-        self.placeholder = placeholder;
         
     }
     return self;
@@ -50,10 +48,11 @@
     self.draggable = YES;
     self.tappable = NO;
     
-    _originalFrame = self.frame;
+//    _originalFrame = self.frame;
     _originalCenter = self.center;
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
+    _animator.delegate = self;
     
     UIPinchGestureRecognizer *pinchGestureRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(handlePinch:)];
     [self addGestureRecognizer:pinchGestureRecognizer];
@@ -63,7 +62,7 @@
     self.tappable = YES;
     self.draggable = NO;
     
-    _originalFrame = self.frame;
+//    _originalFrame = self.frame;
     _originalCenter = center;
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
@@ -204,10 +203,7 @@
 }
 
 - (void)shakeGamePiece {
-//    [self setHidden:YES];
-    
-    UIImage *originalImage = self.image;
-    self.image = self.placeholder.image;
+    self.image = self.image_placeholder;
     
     [UIView animateWithDuration:0.125
                           delay:0.0
@@ -237,8 +233,7 @@
                                                                                         self.transform = CGAffineTransformIdentity;
                                                                                     }
                                                                                     completion:^(BOOL finished){
-//                                                                                        [self setHidden:NO];
-                                                                                        self.image = originalImage;
+                                                                                        self.image = self.image_active;
                                                                                         
                                                                                         [self.delegate gamePieceShakeDidComplete:self];
                                                                                     }];
@@ -248,12 +243,14 @@
 }
 
 - (void)bounceGamePiece {
+    self.image = self.image_inactive;
+    
     [UIView animateWithDuration:0.125
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
                          self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -20.0f);
-                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -20.0f);
+//                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -20.0f);
                      }
                      completion:^(BOOL finished){
                          [UIView animateWithDuration:0.125
@@ -261,7 +258,7 @@
                                              options:UIViewAnimationOptionCurveEaseInOut
                                           animations:^{
                                               self.transform = CGAffineTransformTranslate(self.transform, 0.0f, 40.0f);
-                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 40.0f);
+//                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 40.0f);
                                           }
                                           completion:^(BOOL finished){
                                               [UIView animateWithDuration:0.125
@@ -269,7 +266,7 @@
                                                                   options:UIViewAnimationOptionCurveEaseInOut
                                                                animations:^{
                                                                    self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -40.0f);
-                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -40.0f);
+//                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -40.0f);
                                                                }
                                                                completion:^(BOOL finished){
                                                                    [UIView animateWithDuration:0.125
@@ -277,9 +274,11 @@
                                                                                        options:UIViewAnimationOptionCurveEaseInOut
                                                                                     animations:^{
                                                                                         self.transform = CGAffineTransformIdentity;
-                                                                                        self.placeholder.transform = CGAffineTransformIdentity;
+//                                                                                        self.placeholder.transform = CGAffineTransformIdentity;
                                                                                     }
                                                                                     completion:^(BOOL finished){
+                                                                                        self.image = self.image_active;
+                                                                                        
                                                                                         [self.delegate gamePieceBounceDidComplete:self];
                                                                                     }];
                                                                }];
@@ -366,14 +365,22 @@
                          animations:^{
                              self.transform = CGAffineTransformIdentity;
                              self.frame = self.placeholder.frame;
+                             
+                             self.image = self.image_inactive;
                          }
                          completion:^(BOOL finished){
+                             self.placeholder.alpha = 0.0;
+                             
                              [_animator removeAllBehaviors];
                          }];
     }
     else {
         self.transform = CGAffineTransformIdentity;
         self.frame = self.placeholder.frame;
+        
+        self.image = self.image_inactive;
+        
+        self.placeholder.alpha = 0.0;
         
         [_animator removeAllBehaviors];
     }
@@ -407,15 +414,15 @@
     [self.delegate tappableGamePiece:self didReleaseAtPoint:touchLocation];
 }
 
-#pragma mark - TEMP Methods
-- (void)reset {
-    [_animator removeAllBehaviors];
-    _isScaled = NO;
-    [self zoomGamePieceOut];
-    
-    self.frame = _originalFrame;
-    
-    self.userInteractionEnabled = YES;
-}
+//#pragma mark - TEMP Methods
+//- (void)reset {
+//    [_animator removeAllBehaviors];
+//    _isScaled = NO;
+//    [self zoomGamePieceOut];
+//    
+//    self.frame = _originalFrame;
+//    
+//    self.userInteractionEnabled = YES;
+//}
 
 @end

@@ -44,8 +44,13 @@
     CGRect _northKoreaGamePieceFrameDraggingStep;
     CGRect _japanGamePieceFrameDraggingStep;
     
-    NSArray *_gamePieceArray;
-    NSArray *_placeholderArray;
+    NSMutableArray *_placeholderArray;
+    
+    
+    // NEW
+    NSDictionary *_stageDataDictionary;
+    NSDictionary *_stageMapDataDictionary;
+    NSMutableArray *_gamePieceArray;
 }
 
 - (void)viewDidLoad
@@ -53,58 +58,130 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
+    // We need to extract the properties of the stage from the plist file.
+    NSString* plistsource = [[NSBundle mainBundle] pathForResource:@"MGAPropertyList" ofType:@"plist"];
+    NSArray *temp = [NSArray arrayWithContentsOfFile:plistsource];
     
-    // Add the image to the image view properties
-    self.iv_map = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_map.png"]];
+    // Now that we have a temporary array of all the stages and data,
+    // we grab the stage dictionary we are interested in and setup the properties.
+    int stageIndex = 0;
+    _stageDataDictionary = [temp objectAtIndex:stageIndex];
     
-    self.iv_southKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_SouthKorea.png"]];
-    self.iv_northKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_NorthKorea.png"]];
-    self.iv_japanPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_Japan.png"]];
+    // First setup the map for this stage.
+    _stageMapDataDictionary = [_stageDataDictionary objectForKey:@"map"];
+    self.iv_map = [[UIImageView alloc] initWithImage:[UIImage imageNamed:[_stageMapDataDictionary objectForKey:@"map_image_filename"]]];
     
-    self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"] withPlaceholder:self.iv_southKoreaPlaceholder];
-    self.iv_southKoreaGamePiece.delegate = self;
-    self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"] withPlaceholder:self.iv_northKoreaPlaceholder];
-    self.iv_northKoreaGamePiece.delegate = self;
-    self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"] withPlaceholder:self.iv_japanPlaceholder];
-    self.iv_japanGamePiece.delegate = self;
+    // Next, setup the game pieces and placeholders for each country.
+    NSArray *countries = [_stageDataDictionary objectForKey:@"countries"];
+    _gamePieceArray = [[NSMutableArray alloc] initWithCapacity:[countries count]];
+    
+    for (NSDictionary *countryDictionary in countries) {
+        UIImage *activeImage = [UIImage imageNamed:[countryDictionary objectForKey:@"active_image_filename"]];
+        UIImage *inactiveImage = [UIImage imageNamed:[countryDictionary objectForKey:@"inactive_image_filename"]];
+        UIImage *placeholderImage = [UIImage imageNamed:[countryDictionary objectForKey:@"placeholder_image_filename"]];
+        
+        MGAGamePiece *gamePiece = [[MGAGamePiece alloc] initWithImage:inactiveImage];
+        gamePiece.delegate = self;
+        
+        UIImageView *placeholderImageView = [[UIImageView alloc] initWithImage:placeholderImage];
+        gamePiece.placeholder = placeholderImageView;
+        
+        gamePiece.image_active = activeImage;
+        gamePiece.image_inactive = inactiveImage;
+        gamePiece.image_placeholder = placeholderImage;
+        
+        gamePiece.name = [countryDictionary objectForKey:@"name"];
+        gamePiece.scaleStep2 = [[countryDictionary objectForKey:@"scaleStep2"] floatValue];
+        gamePiece.maxDistanceFromCenterStep3 = [[countryDictionary objectForKey:@"maxDistanceFromCenterStep3"] floatValue];
+        
+        // Get the various frames for this game piece
+        NSDictionary *frames = [countryDictionary objectForKey:@"frames"];
+        
+        NSDictionary *frameStep1 = [frames objectForKey:@"frameStep1"];
+        gamePiece.frameStep1 = CGRectMake([[frameStep1 objectForKey:@"x"] floatValue],
+                                       [[frameStep1 objectForKey:@"y"] floatValue],
+                                       [[frameStep1 objectForKey:@"width"] floatValue],
+                                       [[frameStep1 objectForKey:@"height"] floatValue]);
+        
+        NSDictionary *frameStep2 = [frames objectForKey:@"frameStep2"];
+        gamePiece.frameStep2 = CGRectMake([[frameStep2 objectForKey:@"x"] floatValue],
+                                          [[frameStep2 objectForKey:@"y"] floatValue],
+                                          [[frameStep2 objectForKey:@"width"] floatValue],
+                                          [[frameStep2 objectForKey:@"height"] floatValue]);
+        
+        NSDictionary *frameStep3Placeholder = [frames objectForKey:@"frameStep3Placeholder"];
+        gamePiece.frameStep3Placeholder = CGRectMake([[frameStep3Placeholder objectForKey:@"x"] floatValue],
+                                          [[frameStep3Placeholder objectForKey:@"y"] floatValue],
+                                          [[frameStep3Placeholder objectForKey:@"width"] floatValue],
+                                          [[frameStep3Placeholder objectForKey:@"height"] floatValue]);
+        
+        NSDictionary *frameStep3GamePiece = [frames objectForKey:@"frameStep3GamePiece"];
+        gamePiece.frameStep3GamePiece = CGRectMake([[frameStep3GamePiece objectForKey:@"x"] floatValue],
+                                          [[frameStep3GamePiece objectForKey:@"y"] floatValue],
+                                          [[frameStep3GamePiece objectForKey:@"width"] floatValue],
+                                          [[frameStep3GamePiece objectForKey:@"height"] floatValue]);
+        
+        NSDictionary *frameStep4 = [frames objectForKey:@"frameStep4"];
+        gamePiece.frameStep4 = CGRectMake([[frameStep4 objectForKey:@"x"] floatValue],
+                                          [[frameStep4 objectForKey:@"y"] floatValue],
+                                          [[frameStep4 objectForKey:@"width"] floatValue],
+                                          [[frameStep4 objectForKey:@"height"] floatValue]);
+        
+        [_gamePieceArray addObject:gamePiece];
+    }
     
     
-    // Setup the various frames required for the map pieces for use throughout the stage
-    _mapFrame = CGRectMake(0.0, 0.0, 754.0, 682.0);
+//    // Add the image to the image view properties
+//    self.iv_map = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_map.png"]];
+//    
+//    self.iv_southKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_SouthKorea.png"]];
+//    self.iv_northKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_NorthKorea.png"]];
+//    self.iv_japanPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_Japan.png"]];
+//    
+//    self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"] withPlaceholder:self.iv_southKoreaPlaceholder];
+//    self.iv_southKoreaGamePiece.delegate = self;
+//    self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"] withPlaceholder:self.iv_northKoreaPlaceholder];
+//    self.iv_northKoreaGamePiece.delegate = self;
+//    self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"] withPlaceholder:self.iv_japanPlaceholder];
+//    self.iv_japanGamePiece.delegate = self;
+//    
+//    
+//    // Setup the various frames required for the map pieces for use throughout the stage
+//    _mapFrame = CGRectMake(0.0, 0.0, 754.0, 682.0);
+//    
+//    _southKoreaPlaceholderFrameOnMap = CGRectMake(162.0, 326.0, 117.0, 123.0);
+//    _northKoreaPlaceholderFrameOnMap = CGRectMake(156.0, 219.0, 118.0, 130.0);
+//    _japanPlaceholderFrameOnMap = CGRectMake(129.0, 152.0, 422.0, 484.0);
+//    
+//    _southKoreaGamePieceFrameDraggingStep = CGRectMake(826.0, 151.0, 159.0, 168.0);
+//    _northKoreaGamePieceFrameDraggingStep = CGRectMake(591.0, 469.0, 139.0, 152.0);
+//    _japanGamePieceFrameDraggingStep = CGRectMake(748.0, 397.0, 240.0, 276.0);
     
-    _southKoreaPlaceholderFrameOnMap = CGRectMake(162.0, 326.0, 117.0, 123.0);
-    _northKoreaPlaceholderFrameOnMap = CGRectMake(156.0, 219.0, 118.0, 130.0);
-    _japanPlaceholderFrameOnMap = CGRectMake(129.0, 152.0, 422.0, 484.0);
     
-    _southKoreaGamePieceFrameDraggingStep = CGRectMake(826.0, 151.0, 159.0, 168.0);
-    _northKoreaGamePieceFrameDraggingStep = CGRectMake(591.0, 469.0, 139.0, 152.0);
-    _japanGamePieceFrameDraggingStep = CGRectMake(748.0, 397.0, 240.0, 276.0);
-    
-    
-    // Apply the inital frame for each map piece
-    self.iv_map.frame = _mapFrame;
-    
-    self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
-    self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
-    self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
-    
-    self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
-    self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
-    self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
-    
-    _gamePieceArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaGamePiece, self.iv_southKoreaGamePiece, self.iv_japanGamePiece, nil];
-    _placeholderArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaPlaceholder, self.iv_southKoreaPlaceholder, self.iv_japanPlaceholder, nil];
-    
-    // Add the map piece to the view. Order is important because the game pieces need to be on top of other pieces while dragging.
-    [self.view addSubview:self.iv_map];
-    
-    [self.view addSubview:self.iv_southKoreaPlaceholder];
-    [self.view addSubview:self.iv_northKoreaPlaceholder];
-    [self.view addSubview:self.iv_japanPlaceholder];
-    
-    [self.view addSubview:self.iv_southKoreaGamePiece];
-    [self.view addSubview:self.iv_northKoreaGamePiece];
-    [self.view addSubview:self.iv_japanGamePiece];
+//    // Apply the inital frame for each map piece
+//    self.iv_map.frame = _mapFrame;
+//    
+//    self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
+//    self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
+//    self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
+//    
+//    self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
+//    self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
+//    self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
+//    
+//    _gamePieceArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaGamePiece, self.iv_southKoreaGamePiece, self.iv_japanGamePiece, nil];
+//    _placeholderArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaPlaceholder, self.iv_southKoreaPlaceholder, self.iv_japanPlaceholder, nil];
+//    
+//    // Add the map piece to the view. Order is important because the game pieces need to be on top of other pieces while dragging.
+//    [self.view addSubview:self.iv_map];
+//    
+//    [self.view addSubview:self.iv_southKoreaPlaceholder];
+//    [self.view addSubview:self.iv_northKoreaPlaceholder];
+//    [self.view addSubview:self.iv_japanPlaceholder];
+//    
+//    [self.view addSubview:self.iv_southKoreaGamePiece];
+//    [self.view addSubview:self.iv_northKoreaGamePiece];
+//    [self.view addSubview:self.iv_japanGamePiece];
     
     // TODO: TEMP For now i have only programmed the dragging step. The Stage starts with the animated Intro step.
 //    [self setupGamePiecesForDragging];
@@ -114,6 +191,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    // Setup the UILabel for the instruction text.
     float labelHeight = 80.0f;
     CGRect labelFrame = CGRectMake(0.0, self.view.bounds.size.height, self.view.bounds.size.width, labelHeight);    // Put the view off the screen to the bottom
     self.lbl_instruction = [[UILabel alloc] initWithFrame:labelFrame];
@@ -163,29 +241,31 @@
 #pragma mark - Step 1 (Intro) Instance Methods
 - (void)setupStep1 {
     // Apply the inital frame for each map piece
-    self.iv_map.frame = _mapFrame;
+    NSDictionary *mapFrame = [[[_stageDataDictionary objectForKey:@"map"] objectForKey:@"frames"] objectForKey:@"frameStep1"];
+    self.iv_map.frame = CGRectMake([[mapFrame objectForKey:@"x"] floatValue],
+                                   [[mapFrame objectForKey:@"y"] floatValue],
+                                   [[mapFrame objectForKey:@"width"] floatValue],
+                                   [[mapFrame objectForKey:@"height"] floatValue]);
+    [self.view addSubview:self.iv_map];
     
-    self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
-    self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
-    self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
-    
-    self.iv_southKoreaGamePiece.frame = _southKoreaPlaceholderFrameOnMap;
-    self.iv_northKoreaGamePiece.frame = _northKoreaPlaceholderFrameOnMap;
-    self.iv_japanGamePiece.frame = _japanPlaceholderFrameOnMap;
-    
-    [self.view sendSubviewToBack:self.iv_southKoreaGamePiece];
-    [self.view sendSubviewToBack:self.iv_northKoreaGamePiece];
-    [self.view sendSubviewToBack:self.iv_japanGamePiece];
+    // Apply the frame for step 1 for each game piece
+    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+        gamePiece.image = gamePiece.image_inactive;
+        gamePiece.frame = gamePiece.frameStep1;
+        gamePiece.placeholder.frame = gamePiece.frameStep1;
+        gamePiece.placeholder.alpha = 0.0;
+        
+        [self.view addSubview:gamePiece];
+        [self.view addSubview:gamePiece.placeholder];
+    }
 }
 
 - (void)introduceGamePiece:(MGAGamePiece *)gamePiece
-           withPlaceholder:(UIImageView *)placeholder
                  withScale:(float)scale
                   withText:(NSString *)text
                 completion:(void (^)(void))completion
 {
     CGPoint originalCenterGamePiece = gamePiece.center;
-    CGPoint originalCenterPlaceholder = placeholder.center;
     
     [self.lbl_instruction setText:text];
     
@@ -201,20 +281,12 @@
                          for (MGAGamePiece *otherGamePiece in _gamePieceArray) {
                              if (otherGamePiece != gamePiece) {
                                  otherGamePiece.alpha = 0.0f;
-                             }
-                         }
-                         
-                         for (UIImageView *otherPlaceholder in _placeholderArray) {
-                             if (otherPlaceholder != placeholder) {
-                                 otherPlaceholder.alpha = 0.0f;
+                                 otherGamePiece.placeholder.alpha = 0.0f;
                              }
                          }
                          
                          gamePiece.center = self.view.center;
                          gamePiece.transform = CGAffineTransformScale(gamePiece.transform, scale, scale);
-                         
-                         placeholder.center = self.view.center;
-                         placeholder.transform = CGAffineTransformScale(placeholder.transform, scale, scale);
                          
                          _lbl_instruction.frame = newLabelFrame;
                      }
@@ -233,17 +305,8 @@
                                                   }
                                               }
                                               
-                                              for (UIImageView *otherPlaceholder in _placeholderArray) {
-                                                  if (otherPlaceholder != placeholder) {
-                                                      otherPlaceholder.alpha = 1.0f;
-                                                  }
-                                              }
-                                              
                                               gamePiece.center = originalCenterGamePiece;
                                               gamePiece.transform = CGAffineTransformIdentity;
-                                              
-                                              placeholder.center = originalCenterPlaceholder;
-                                              placeholder.transform = CGAffineTransformIdentity;
                                               
                                               _lbl_instruction.frame = newLabelFrame;
                                           }
@@ -256,35 +319,39 @@
 
 - (void)startStep1 {
     // For every game piece we create a completion block that will instruct
-    // the view control to introduce the next game piece. The last game piece
-    // has no completion handler.
+    // the viewController to introduce the next game piece.
+    // The last game piece has no completion handler.
     
-    void (^nextStep)(void) = ^(void) {
+    int gamePieceCount = [_gamePieceArray count];
+    
+    NSMutableArray *completionBlocks = [[NSMutableArray alloc] initWithCapacity:gamePieceCount];
+    
+    void (^lastBlock)(void) = ^(void) {
         [self endStep1];
     };
+    [completionBlocks addObject:lastBlock];
     
-    void (^showJapan)(void) = ^(void) {
-        [self introduceGamePiece:self.iv_japanGamePiece
-                 withPlaceholder:self.iv_japanPlaceholder
-                       withScale:1.25
-                        withText:@"This is Japan"
-                      completion:nextStep];
-    };
-    
-    void (^showSouthKorea)(void) = ^(void) {
-        [self introduceGamePiece:self.iv_southKoreaGamePiece
-                 withPlaceholder:self.iv_southKoreaPlaceholder
-                       withScale:2.0
-                        withText:@"This is South Korea"
-                      completion:showJapan];
-    };
+    int blockIndex = 0;
+    for (int i = gamePieceCount - 1; i > 0; i--) {
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
+        void (^completionBlock)(void) = ^(void) {
+            [self introduceGamePiece:gamePiece
+                           withScale:gamePiece.scaleStep2
+                            withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
+                          completion:[completionBlocks objectAtIndex:blockIndex]];
+        };
+        
+        [completionBlocks addObject:completionBlock];
+        blockIndex++;
+    }
+    NSArray* reversedCompletionBlocks = [[completionBlocks reverseObjectEnumerator] allObjects];
     
     // We start with the first game piece in the stage. We hide the map at the same time.
-    [self introduceGamePiece:self.iv_northKoreaGamePiece
-             withPlaceholder:self.iv_northKoreaPlaceholder
-                   withScale:2.0
-                    withText:@"This is North Korea"
-                  completion:showSouthKorea];
+    MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:0];
+    [self introduceGamePiece:gamePiece
+                   withScale:gamePiece.scaleStep2
+                    withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
+                  completion:[reversedCompletionBlocks objectAtIndex:0]];
 }
 
 - (void)endStep1 {
@@ -297,10 +364,7 @@
                          
                          for (MGAGamePiece *gamePiece in _gamePieceArray) {
                              gamePiece.alpha = 0.0f;
-                         }
-                         
-                         for (UIImageView *placeholder in _placeholderArray) {
-                             placeholder.alpha = 0.0f;
+                             gamePiece.placeholder.alpha = 0.0f;
                          }
                      }
                      completion:^(BOOL finished){
@@ -313,41 +377,33 @@
     // Move the game pieces to the top off the screen, off the screen
     // so they can drop into place to begin the next step.
     
-    self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
-    self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
-    self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
+    int gamePieceCount = [_gamePieceArray count];
     
-    self.iv_southKoreaGamePiece.center = CGPointMake(170.0f, -384.0f);
-    self.iv_northKoreaGamePiece.center = CGPointMake(510.0f, -384.0f);
-    self.iv_japanGamePiece.center = CGPointMake(850.0f, -384.0f);
+    // TODO: Layout currently only supports 1 row of pieces. Need a more scalable solution for when 3+ pieces are shown.
+    for (int i = 0; i < gamePieceCount; i++) {
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
+        gamePiece.image = gamePiece.image_active;
+        gamePiece.frame = gamePiece.frameStep2;
+        gamePiece.center = CGPointMake((i+i+1)*(self.view.bounds.size.width / (2*gamePieceCount)), -(self.view.bounds.size.height/2));
+        gamePiece.alpha = 1.0f;
+        [gamePiece setUserInteractionEnabled:NO];
+    }
     
-    self.iv_southKoreaGamePiece.alpha = 1.0f;
-    self.iv_northKoreaGamePiece.alpha = 1.0f;
-    self.iv_japanGamePiece.alpha = 1.0f;
+    for (int i = 0; i < gamePieceCount; i++) {
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
+        CGPoint center = CGPointMake(gamePiece.center.x, self.view.bounds.size.height/2);
+        [gamePiece makeGamePieceTappableWithCenter:center];
+        
+        [gamePiece performSelector:@selector(setUserInteractionEnabled:) withObject:[NSNumber numberWithBool:YES] afterDelay:2.0];
+    }
     
-    [self.iv_southKoreaGamePiece setUserInteractionEnabled:NO];
-    [self.iv_northKoreaGamePiece setUserInteractionEnabled:NO];
-    [self.iv_japanGamePiece setUserInteractionEnabled:NO];
-    
-    [self.iv_southKoreaGamePiece makeGamePieceTappableWithCenter:CGPointMake(170.0f, 384.0f)];
-    [self.iv_northKoreaGamePiece makeGamePieceTappableWithCenter:CGPointMake(510.0f, 384.0f)];
-    [self.iv_japanGamePiece makeGamePieceTappableWithCenter:CGPointMake(850.0f, 384.0f)];
-    
-    [self.view bringSubviewToFront:self.iv_southKoreaGamePiece];
-    [self.view bringSubviewToFront:self.iv_northKoreaGamePiece];
-    [self.view bringSubviewToFront:self.iv_japanGamePiece];
-    
-    void (^enableGamePieces)(void) = ^(void) {
-        [self.iv_southKoreaGamePiece setUserInteractionEnabled:YES];
-        [self.iv_northKoreaGamePiece setUserInteractionEnabled:YES];
-        [self.iv_japanGamePiece setUserInteractionEnabled:YES];
-    };
-    
-    [self showInstructionWithText:@"Show me South Korea" completion:enableGamePieces];
+    // TODO: Randomize step 2 and shuffle until all countries are identified.
+    [self showInstructionWithText:@"Show me South Korea" completion:nil];
 }
 
 #pragma mark - Step 3 (Dragging - On Map) Instance Methods
 - (void)startStep3 {
+    // Setup game pieces for dragging step and move them to their starting location on the screen.
     [UIView animateWithDuration:0.7
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
@@ -355,24 +411,15 @@
                          self.iv_map.alpha = 1.0f;
                          
                          for (MGAGamePiece *gamePiece in _gamePieceArray) {
+                             gamePiece.image = gamePiece.image_active;
                              gamePiece.alpha = 1.0f;
+                             gamePiece.placeholder.alpha = 1.0f;
+                             
+                             gamePiece.frame = gamePiece.frameStep3GamePiece;
+                             gamePiece.placeholder.frame = gamePiece.frameStep3Placeholder;
+                             
+                             [self.view bringSubviewToFront:gamePiece];
                          }
-                         
-                         for (UIImageView *placeholder in _placeholderArray) {
-                             placeholder.alpha = 1.0f;
-                         }
-                         
-                         self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
-                         self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
-                         self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
-                         
-                         self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
-                         self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
-                         self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
-                         
-                         [self.view bringSubviewToFront:self.iv_southKoreaGamePiece];
-                         [self.view bringSubviewToFront:self.iv_northKoreaGamePiece];
-                         [self.view bringSubviewToFront:self.iv_japanGamePiece];
                      }
                      completion:^(BOOL finished){
                          [self setupGamePiecesForDragging];
@@ -382,14 +429,9 @@
 }
 
 - (void)setupGamePiecesForDragging {
-    [self.iv_southKoreaGamePiece makeGamePieceDraggable];
-    _maxDistanceFromCenter = 50.0f;
-    
-    [self.iv_northKoreaGamePiece makeGamePieceDraggable];
-    _maxDistanceFromCenter = 50.0f;
-    
-    [self.iv_japanGamePiece makeGamePieceDraggable];
-    _maxDistanceFromCenter = 50.0f;
+    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+        [gamePiece makeGamePieceDraggable];
+    }
 }
 
 
@@ -398,6 +440,14 @@
     // Game pieces should now be in their proper postions on the map.
     // Make them tappable for this step.
     
+    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+        [gamePiece makeGamePieceTappableWithCenter:gamePiece.center];
+        gamePiece.image = gamePiece.image_active;
+        
+        [gamePiece setUserInteractionEnabled:YES];
+    }
+    
+    [self showInstructionWithText:@"Show me South Korea" completion:nil];
 }
 
 
@@ -414,18 +464,19 @@
     CGPoint p1 = gamePiece.placeholder.center;
     CGPoint p2 = gamePiece.center;
     
-    CGFloat targetDistance = _maxDistanceFromCenter;
+    CGFloat targetDistance = gamePiece.maxDistanceFromCenterStep3;
     
     CGFloat distanceCenters = hypotf(p1.x - p2.x, p1.y - p2.y);
     
     if (distanceCenters <= targetDistance) {
         [gamePiece placeGamePieceOnMapTarget:YES];
         
-        [self.view sendSubviewToBack:gamePiece.placeholder];
-        [self.view sendSubviewToBack:gamePiece];
-        
         // Disable further interation with the game piece
         [gamePiece setUserInteractionEnabled:NO];
+        
+        if ([gamePiece.name isEqualToString:@"South Korea"]) {
+            [self startStep4];
+        }
     }
     else {
         [gamePiece returnGamePieceToOriginalLocation];
@@ -450,7 +501,7 @@
 }
 
 - (void)tappableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
-    if (gamePiece == self.iv_southKoreaGamePiece) {
+    if ([gamePiece.name isEqualToString:@"South Korea"]) {
         [gamePiece bounceGamePiece];
     }
     else {
@@ -467,12 +518,6 @@
 }
 
 #pragma mark - Navigation Methods
-- (IBAction)onResetButtonPressed:(id)sender {
-    [self.iv_japanGamePiece reset];
-    [self.iv_northKoreaGamePiece reset];
-    [self.iv_southKoreaGamePiece reset];
-}
-
 - (IBAction)onBackButtonPressed:(id)sender {
     [self.navigationController popViewControllerAnimated:YES];
 }

@@ -26,12 +26,12 @@
 
 @end
 
-@interface MGAGamePiece : UIImageView < UIGestureRecognizerDelegate > {
+@interface MGAGamePiece : UIImageView < UIGestureRecognizerDelegate, UIDynamicAnimatorDelegate > {
     UIDynamicAnimator *_animator;
     UISnapBehavior *_snapBehavior;
     UIAttachmentBehavior *_touchAttachmentBehavior;
     
-    CGRect _originalFrame;
+//    CGRect _originalFrame;
     CGPoint _originalCenter;
     
     CGPoint _startLocation;
@@ -43,25 +43,26 @@
 
 @property (weak, nonatomic) id <MGAGamePieceDelegate> delegate;
 
+@property (nonatomic, strong) UIView *referenceView;
 @property (nonatomic, assign) BOOL draggable;
 @property (nonatomic, assign) BOOL tappable;
 
 // Game Piece Properties From Dictionary
-@property (nonatomic, strong) UIView *referenceView;
+@property (nonatomic, copy) NSString *name;
+@property (nonatomic, assign) float scaleStep2;
+@property (nonatomic, assign) float maxDistanceFromCenterStep3;
+@property (nonatomic, strong) UIImage *image_placeholder;
+@property (nonatomic, strong) UIImage *image_active;
+@property (nonatomic, strong) UIImage *image_inactive;
 @property (nonatomic, strong) UIImageView *placeholder;
 @property (nonatomic) CGRect frameStep1;
 @property (nonatomic) CGRect frameStep2;
 @property (nonatomic) CGRect frameStep3Placeholder;
 @property (nonatomic) CGRect frameStep3GamePiece;
 @property (nonatomic) CGRect frameStep4;
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, copy) NSString *instructionStep1;
-@property (nonatomic, copy) NSString *instructionStep2;
-@property (nonatomic, copy) NSString *instructionStep3;
-@property (nonatomic, copy) NSString *instructionStep4;
 
 - (id)initWithFrame:(CGRect)frame;
-- (id)initWithImage:(UIImage *)image withPlaceholder:(UIImageView *)placeholder;
+- (id)initWithImage:(UIImage *)image;
 - (void)makeGamePieceDraggable;
 - (void)makeGamePieceTappableWithCenter:(CGPoint)center;
 - (void)returnGamePieceToOriginalLocation;
