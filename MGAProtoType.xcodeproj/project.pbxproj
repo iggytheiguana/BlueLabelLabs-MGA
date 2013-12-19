@@ -7,17 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5201A9461862A865006DAEC7 /* stage1_active_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9341862A865006DAEC7 /* stage1_active_Japan.png */; };
+		5201A9471862A865006DAEC7 /* stage1_active_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9351862A865006DAEC7 /* stage1_active_Japan@2x.png */; };
+		5201A9481862A865006DAEC7 /* stage1_active_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9361862A865006DAEC7 /* stage1_active_NorthKorea.png */; };
+		5201A9491862A865006DAEC7 /* stage1_active_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9371862A865006DAEC7 /* stage1_active_NorthKorea@2x.png */; };
+		5201A94A1862A865006DAEC7 /* stage1_active_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9381862A865006DAEC7 /* stage1_active_SouthKorea.png */; };
+		5201A94B1862A865006DAEC7 /* stage1_active_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9391862A865006DAEC7 /* stage1_active_SouthKorea@2x.png */; };
+		5201A94C1862A865006DAEC7 /* stage1_inactive_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93A1862A865006DAEC7 /* stage1_inactive_Japan.png */; };
+		5201A94D1862A865006DAEC7 /* stage1_inactive_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93B1862A865006DAEC7 /* stage1_inactive_Japan@2x.png */; };
+		5201A94E1862A865006DAEC7 /* stage1_inactive_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93C1862A865006DAEC7 /* stage1_inactive_NorthKorea.png */; };
+		5201A94F1862A865006DAEC7 /* stage1_inactive_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93D1862A865006DAEC7 /* stage1_inactive_NorthKorea@2x.png */; };
+		5201A9501862A865006DAEC7 /* stage1_inactive_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93E1862A865006DAEC7 /* stage1_inactive_SouthKorea.png */; };
+		5201A9511862A865006DAEC7 /* stage1_inactive_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A93F1862A865006DAEC7 /* stage1_inactive_SouthKorea@2x.png */; };
+		5201A9521862A865006DAEC7 /* stage1_placeholder_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9401862A865006DAEC7 /* stage1_placeholder_Japan.png */; };
+		5201A9531862A865006DAEC7 /* stage1_placeholder_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9411862A865006DAEC7 /* stage1_placeholder_Japan@2x.png */; };
+		5201A9541862A865006DAEC7 /* stage1_placeholder_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9421862A865006DAEC7 /* stage1_placeholder_NorthKorea.png */; };
+		5201A9551862A865006DAEC7 /* stage1_placeholder_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9431862A865006DAEC7 /* stage1_placeholder_NorthKorea@2x.png */; };
+		5201A9561862A865006DAEC7 /* stage1_placeholder_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9441862A865006DAEC7 /* stage1_placeholder_SouthKorea.png */; };
+		5201A9571862A865006DAEC7 /* stage1_placeholder_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5201A9451862A865006DAEC7 /* stage1_placeholder_SouthKorea@2x.png */; };
 		52170EC51860FD1A0096C7A5 /* MGAPropertyList.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC41860FD1A0096C7A5 /* MGAPropertyList.plist */; };
-		52170ED2186133250096C7A5 /* stage1_active_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC6186133250096C7A5 /* stage1_active_Japan.png */; };
-		52170ED3186133250096C7A5 /* stage1_active_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC7186133250096C7A5 /* stage1_active_Japan@2x.png */; };
-		52170ED4186133250096C7A5 /* stage1_active_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC8186133250096C7A5 /* stage1_active_NorthKorea.png */; };
-		52170ED5186133250096C7A5 /* stage1_active_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170EC9186133250096C7A5 /* stage1_active_NorthKorea@2x.png */; };
-		52170ED6186133250096C7A5 /* stage1_active_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ECA186133250096C7A5 /* stage1_active_SouthKorea.png */; };
-		52170ED7186133250096C7A5 /* stage1_active_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ECB186133250096C7A5 /* stage1_active_SouthKorea@2x.png */; };
-		52170EDA186133250096C7A5 /* stage1_inactive_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ECE186133250096C7A5 /* stage1_inactive_NorthKorea.png */; };
-		52170EDB186133250096C7A5 /* stage1_inactive_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ECF186133250096C7A5 /* stage1_inactive_NorthKorea@2x.png */; };
-		52170EDC186133250096C7A5 /* stage1_inactive_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ED0186133250096C7A5 /* stage1_inactive_SouthKorea.png */; };
-		52170EDD186133250096C7A5 /* stage1_inactive_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52170ED1186133250096C7A5 /* stage1_inactive_SouthKorea@2x.png */; };
 		524AB6B1183592ED00E84DC1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B0183592ED00E84DC1 /* Foundation.framework */; };
 		524AB6B3183592ED00E84DC1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B2183592ED00E84DC1 /* CoreGraphics.framework */; };
 		524AB6B5183592ED00E84DC1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 524AB6B4183592ED00E84DC1 /* UIKit.framework */; };
@@ -35,19 +43,11 @@
 		524AB6F5183599C000E84DC1 /* MGAGamePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = 524AB6F4183599C000E84DC1 /* MGAGamePiece.m */; };
 		52F608761852A49800AD8943 /* stage1_map.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F608681852A49800AD8943 /* stage1_map.png */; };
 		52F608771852A49800AD8943 /* stage1_map@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F608691852A49800AD8943 /* stage1_map@2x.png */; };
-		52F608781852A49800AD8943 /* stage1_placeholder_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086A1852A49800AD8943 /* stage1_placeholder_Japan.png */; };
-		52F608791852A49800AD8943 /* stage1_placeholder_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086B1852A49800AD8943 /* stage1_placeholder_Japan@2x.png */; };
-		52F6087A1852A49800AD8943 /* stage1_placeholder_NorthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086C1852A49800AD8943 /* stage1_placeholder_NorthKorea.png */; };
-		52F6087B1852A49800AD8943 /* stage1_placeholder_NorthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086D1852A49800AD8943 /* stage1_placeholder_NorthKorea@2x.png */; };
-		52F6087C1852A49800AD8943 /* stage1_placeholder_SouthKorea.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086E1852A49800AD8943 /* stage1_placeholder_SouthKorea.png */; };
-		52F6087D1852A49800AD8943 /* stage1_placeholder_SouthKorea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F6086F1852A49800AD8943 /* stage1_placeholder_SouthKorea@2x.png */; };
 		52F8177E1862720A006F3B6B /* tempHomeScreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8177C1862720A006F3B6B /* tempHomeScreen.png */; };
 		52F8177F1862720A006F3B6B /* tempHomeScreen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8177D1862720A006F3B6B /* tempHomeScreen@2x.png */; };
 		52F8178418627419006F3B6B /* button-back.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8178218627419006F3B6B /* button-back.png */; };
 		52F8178518627419006F3B6B /* button-back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8178318627419006F3B6B /* button-back@2x.png */; };
 		52F8178918627659006F3B6B /* NSMutableArray+Shuffling.m in Sources */ = {isa = PBXBuildFile; fileRef = 52F8178818627659006F3B6B /* NSMutableArray+Shuffling.m */; };
-		52F8178D1862A4A2006F3B6B /* stage1_inactive_Japan.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8178B1862A4A2006F3B6B /* stage1_inactive_Japan.png */; };
-		52F8178E1862A4A2006F3B6B /* stage1_inactive_Japan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 52F8178C1862A4A2006F3B6B /* stage1_inactive_Japan@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,17 +61,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5201A9341862A865006DAEC7 /* stage1_active_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_Japan.png; sourceTree = "<group>"; };
+		5201A9351862A865006DAEC7 /* stage1_active_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_Japan@2x.png"; sourceTree = "<group>"; };
+		5201A9361862A865006DAEC7 /* stage1_active_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_NorthKorea.png; sourceTree = "<group>"; };
+		5201A9371862A865006DAEC7 /* stage1_active_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_NorthKorea@2x.png"; sourceTree = "<group>"; };
+		5201A9381862A865006DAEC7 /* stage1_active_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_SouthKorea.png; sourceTree = "<group>"; };
+		5201A9391862A865006DAEC7 /* stage1_active_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_SouthKorea@2x.png"; sourceTree = "<group>"; };
+		5201A93A1862A865006DAEC7 /* stage1_inactive_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_Japan.png; sourceTree = "<group>"; };
+		5201A93B1862A865006DAEC7 /* stage1_inactive_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_Japan@2x.png"; sourceTree = "<group>"; };
+		5201A93C1862A865006DAEC7 /* stage1_inactive_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_NorthKorea.png; sourceTree = "<group>"; };
+		5201A93D1862A865006DAEC7 /* stage1_inactive_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_NorthKorea@2x.png"; sourceTree = "<group>"; };
+		5201A93E1862A865006DAEC7 /* stage1_inactive_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_SouthKorea.png; sourceTree = "<group>"; };
+		5201A93F1862A865006DAEC7 /* stage1_inactive_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_SouthKorea@2x.png"; sourceTree = "<group>"; };
+		5201A9401862A865006DAEC7 /* stage1_placeholder_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_Japan.png; sourceTree = "<group>"; };
+		5201A9411862A865006DAEC7 /* stage1_placeholder_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_Japan@2x.png"; sourceTree = "<group>"; };
+		5201A9421862A865006DAEC7 /* stage1_placeholder_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_NorthKorea.png; sourceTree = "<group>"; };
+		5201A9431862A865006DAEC7 /* stage1_placeholder_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_NorthKorea@2x.png"; sourceTree = "<group>"; };
+		5201A9441862A865006DAEC7 /* stage1_placeholder_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_SouthKorea.png; sourceTree = "<group>"; };
+		5201A9451862A865006DAEC7 /* stage1_placeholder_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_SouthKorea@2x.png"; sourceTree = "<group>"; };
 		52170EC41860FD1A0096C7A5 /* MGAPropertyList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = MGAPropertyList.plist; sourceTree = "<group>"; };
-		52170EC6186133250096C7A5 /* stage1_active_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_Japan.png; sourceTree = "<group>"; };
-		52170EC7186133250096C7A5 /* stage1_active_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_Japan@2x.png"; sourceTree = "<group>"; };
-		52170EC8186133250096C7A5 /* stage1_active_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_NorthKorea.png; sourceTree = "<group>"; };
-		52170EC9186133250096C7A5 /* stage1_active_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_NorthKorea@2x.png"; sourceTree = "<group>"; };
-		52170ECA186133250096C7A5 /* stage1_active_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_active_SouthKorea.png; sourceTree = "<group>"; };
-		52170ECB186133250096C7A5 /* stage1_active_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_active_SouthKorea@2x.png"; sourceTree = "<group>"; };
-		52170ECE186133250096C7A5 /* stage1_inactive_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_NorthKorea.png; sourceTree = "<group>"; };
-		52170ECF186133250096C7A5 /* stage1_inactive_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_NorthKorea@2x.png"; sourceTree = "<group>"; };
-		52170ED0186133250096C7A5 /* stage1_inactive_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_SouthKorea.png; sourceTree = "<group>"; };
-		52170ED1186133250096C7A5 /* stage1_inactive_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_SouthKorea@2x.png"; sourceTree = "<group>"; };
 		524AB6AD183592ED00E84DC1 /* MGAProtoType.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MGAProtoType.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		524AB6B0183592ED00E84DC1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		524AB6B2183592ED00E84DC1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -95,12 +103,6 @@
 		524AB6F4183599C000E84DC1 /* MGAGamePiece.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGAGamePiece.m; sourceTree = "<group>"; };
 		52F608681852A49800AD8943 /* stage1_map.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_map.png; sourceTree = "<group>"; };
 		52F608691852A49800AD8943 /* stage1_map@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_map@2x.png"; sourceTree = "<group>"; };
-		52F6086A1852A49800AD8943 /* stage1_placeholder_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_Japan.png; sourceTree = "<group>"; };
-		52F6086B1852A49800AD8943 /* stage1_placeholder_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_Japan@2x.png"; sourceTree = "<group>"; };
-		52F6086C1852A49800AD8943 /* stage1_placeholder_NorthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_NorthKorea.png; sourceTree = "<group>"; };
-		52F6086D1852A49800AD8943 /* stage1_placeholder_NorthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_NorthKorea@2x.png"; sourceTree = "<group>"; };
-		52F6086E1852A49800AD8943 /* stage1_placeholder_SouthKorea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_placeholder_SouthKorea.png; sourceTree = "<group>"; };
-		52F6086F1852A49800AD8943 /* stage1_placeholder_SouthKorea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_placeholder_SouthKorea@2x.png"; sourceTree = "<group>"; };
 		52F8177A18621AA8006F3B6B /* MGAStageSteps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGAStageSteps.h; sourceTree = "<group>"; };
 		52F8177B18623044006F3B6B /* MGAStages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGAStages.h; sourceTree = "<group>"; };
 		52F8177C1862720A006F3B6B /* tempHomeScreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tempHomeScreen.png; sourceTree = "<group>"; };
@@ -109,8 +111,6 @@
 		52F8178318627419006F3B6B /* button-back@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-back@2x.png"; sourceTree = "<group>"; };
 		52F8178718627659006F3B6B /* NSMutableArray+Shuffling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+Shuffling.h"; sourceTree = "<group>"; };
 		52F8178818627659006F3B6B /* NSMutableArray+Shuffling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+Shuffling.m"; sourceTree = "<group>"; };
-		52F8178B1862A4A2006F3B6B /* stage1_inactive_Japan.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = stage1_inactive_Japan.png; sourceTree = "<group>"; };
-		52F8178C1862A4A2006F3B6B /* stage1_inactive_Japan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "stage1_inactive_Japan@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,24 +249,24 @@
 			children = (
 				52F608681852A49800AD8943 /* stage1_map.png */,
 				52F608691852A49800AD8943 /* stage1_map@2x.png */,
-				52170EC6186133250096C7A5 /* stage1_active_Japan.png */,
-				52170EC7186133250096C7A5 /* stage1_active_Japan@2x.png */,
-				52170EC8186133250096C7A5 /* stage1_active_NorthKorea.png */,
-				52170EC9186133250096C7A5 /* stage1_active_NorthKorea@2x.png */,
-				52170ECA186133250096C7A5 /* stage1_active_SouthKorea.png */,
-				52170ECB186133250096C7A5 /* stage1_active_SouthKorea@2x.png */,
-				52F8178B1862A4A2006F3B6B /* stage1_inactive_Japan.png */,
-				52F8178C1862A4A2006F3B6B /* stage1_inactive_Japan@2x.png */,
-				52170ECE186133250096C7A5 /* stage1_inactive_NorthKorea.png */,
-				52170ECF186133250096C7A5 /* stage1_inactive_NorthKorea@2x.png */,
-				52170ED0186133250096C7A5 /* stage1_inactive_SouthKorea.png */,
-				52170ED1186133250096C7A5 /* stage1_inactive_SouthKorea@2x.png */,
-				52F6086A1852A49800AD8943 /* stage1_placeholder_Japan.png */,
-				52F6086B1852A49800AD8943 /* stage1_placeholder_Japan@2x.png */,
-				52F6086C1852A49800AD8943 /* stage1_placeholder_NorthKorea.png */,
-				52F6086D1852A49800AD8943 /* stage1_placeholder_NorthKorea@2x.png */,
-				52F6086E1852A49800AD8943 /* stage1_placeholder_SouthKorea.png */,
-				52F6086F1852A49800AD8943 /* stage1_placeholder_SouthKorea@2x.png */,
+				5201A9341862A865006DAEC7 /* stage1_active_Japan.png */,
+				5201A9351862A865006DAEC7 /* stage1_active_Japan@2x.png */,
+				5201A9361862A865006DAEC7 /* stage1_active_NorthKorea.png */,
+				5201A9371862A865006DAEC7 /* stage1_active_NorthKorea@2x.png */,
+				5201A9381862A865006DAEC7 /* stage1_active_SouthKorea.png */,
+				5201A9391862A865006DAEC7 /* stage1_active_SouthKorea@2x.png */,
+				5201A93A1862A865006DAEC7 /* stage1_inactive_Japan.png */,
+				5201A93B1862A865006DAEC7 /* stage1_inactive_Japan@2x.png */,
+				5201A93C1862A865006DAEC7 /* stage1_inactive_NorthKorea.png */,
+				5201A93D1862A865006DAEC7 /* stage1_inactive_NorthKorea@2x.png */,
+				5201A93E1862A865006DAEC7 /* stage1_inactive_SouthKorea.png */,
+				5201A93F1862A865006DAEC7 /* stage1_inactive_SouthKorea@2x.png */,
+				5201A9401862A865006DAEC7 /* stage1_placeholder_Japan.png */,
+				5201A9411862A865006DAEC7 /* stage1_placeholder_Japan@2x.png */,
+				5201A9421862A865006DAEC7 /* stage1_placeholder_NorthKorea.png */,
+				5201A9431862A865006DAEC7 /* stage1_placeholder_NorthKorea@2x.png */,
+				5201A9441862A865006DAEC7 /* stage1_placeholder_SouthKorea.png */,
+				5201A9451862A865006DAEC7 /* stage1_placeholder_SouthKorea@2x.png */,
 			);
 			path = "Stage 1";
 			sourceTree = "<group>";
@@ -370,34 +370,34 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5201A94B1862A865006DAEC7 /* stage1_active_SouthKorea@2x.png in Resources */,
+				5201A9471862A865006DAEC7 /* stage1_active_Japan@2x.png in Resources */,
 				524AB6C9183592ED00E84DC1 /* Images.xcassets in Resources */,
+				5201A94F1862A865006DAEC7 /* stage1_inactive_NorthKorea@2x.png in Resources */,
+				5201A9561862A865006DAEC7 /* stage1_placeholder_SouthKorea.png in Resources */,
+				5201A94D1862A865006DAEC7 /* stage1_inactive_Japan@2x.png in Resources */,
 				52F8177F1862720A006F3B6B /* tempHomeScreen@2x.png in Resources */,
-				52170ED4186133250096C7A5 /* stage1_active_NorthKorea.png in Resources */,
-				52170EDD186133250096C7A5 /* stage1_inactive_SouthKorea@2x.png in Resources */,
 				52F8178518627419006F3B6B /* button-back@2x.png in Resources */,
+				5201A9571862A865006DAEC7 /* stage1_placeholder_SouthKorea@2x.png in Resources */,
+				5201A94A1862A865006DAEC7 /* stage1_active_SouthKorea.png in Resources */,
+				5201A9481862A865006DAEC7 /* stage1_active_NorthKorea.png in Resources */,
 				52F8177E1862720A006F3B6B /* tempHomeScreen.png in Resources */,
-				52F608791852A49800AD8943 /* stage1_placeholder_Japan@2x.png in Resources */,
 				52170EC51860FD1A0096C7A5 /* MGAPropertyList.plist in Resources */,
-				52F6087A1852A49800AD8943 /* stage1_placeholder_NorthKorea.png in Resources */,
-				52170ED2186133250096C7A5 /* stage1_active_Japan.png in Resources */,
+				5201A9541862A865006DAEC7 /* stage1_placeholder_NorthKorea.png in Resources */,
 				52F608771852A49800AD8943 /* stage1_map@2x.png in Resources */,
-				52F6087B1852A49800AD8943 /* stage1_placeholder_NorthKorea@2x.png in Resources */,
-				52170ED5186133250096C7A5 /* stage1_active_NorthKorea@2x.png in Resources */,
-				52170EDB186133250096C7A5 /* stage1_inactive_NorthKorea@2x.png in Resources */,
-				52170EDC186133250096C7A5 /* stage1_inactive_SouthKorea.png in Resources */,
 				524AB6BB183592ED00E84DC1 /* InfoPlist.strings in Resources */,
-				52170ED7186133250096C7A5 /* stage1_active_SouthKorea@2x.png in Resources */,
 				52F8178418627419006F3B6B /* button-back.png in Resources */,
-				52170ED3186133250096C7A5 /* stage1_active_Japan@2x.png in Resources */,
+				5201A9501862A865006DAEC7 /* stage1_inactive_SouthKorea.png in Resources */,
+				5201A9511862A865006DAEC7 /* stage1_inactive_SouthKorea@2x.png in Resources */,
+				5201A94E1862A865006DAEC7 /* stage1_inactive_NorthKorea.png in Resources */,
+				5201A9461862A865006DAEC7 /* stage1_active_Japan.png in Resources */,
+				5201A9521862A865006DAEC7 /* stage1_placeholder_Japan.png in Resources */,
 				52F608761852A49800AD8943 /* stage1_map.png in Resources */,
-				52F8178D1862A4A2006F3B6B /* stage1_inactive_Japan.png in Resources */,
-				52F8178E1862A4A2006F3B6B /* stage1_inactive_Japan@2x.png in Resources */,
-				52F6087C1852A49800AD8943 /* stage1_placeholder_SouthKorea.png in Resources */,
-				52170ED6186133250096C7A5 /* stage1_active_SouthKorea.png in Resources */,
+				5201A9531862A865006DAEC7 /* stage1_placeholder_Japan@2x.png in Resources */,
+				5201A9551862A865006DAEC7 /* stage1_placeholder_NorthKorea@2x.png in Resources */,
+				5201A9491862A865006DAEC7 /* stage1_active_NorthKorea@2x.png in Resources */,
 				524AB6C4183592ED00E84DC1 /* Main.storyboard in Resources */,
-				52F608781852A49800AD8943 /* stage1_placeholder_Japan.png in Resources */,
-				52F6087D1852A49800AD8943 /* stage1_placeholder_SouthKorea@2x.png in Resources */,
-				52170EDA186133250096C7A5 /* stage1_inactive_NorthKorea.png in Resources */,
+				5201A94C1862A865006DAEC7 /* stage1_inactive_Japan.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

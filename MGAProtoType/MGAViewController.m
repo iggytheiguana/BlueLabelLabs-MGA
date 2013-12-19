@@ -132,7 +132,7 @@
     [self.lbl_instruction setBackgroundColor:[UIColor colorWithRed:175.0f/255.0f green:235.0f/255.0f blue:254.0f/255.0f alpha:1.0f]];
     [self.lbl_instruction setTextAlignment:NSTextAlignmentCenter];
     [self.lbl_instruction setTextColor:[UIColor whiteColor]];
-    [self.lbl_instruction setFont:[UIFont systemFontOfSize:36.0f]];
+    [self.lbl_instruction setFont:[UIFont boldSystemFontOfSize:36.0f]];
     [self.view addSubview:self.lbl_instruction];
     
     [self startStep0];
@@ -221,6 +221,8 @@
                   withText:(NSString *)text
                 completion:(void (^)(void))completion
 {
+    [self.view bringSubviewToFront:gamePiece];
+    
     CGPoint originalCenterGamePiece = gamePiece.center;
     
     [self.lbl_instruction setText:[NSString stringWithFormat:@"This is %@", gamePiece.name]];
@@ -615,7 +617,7 @@
 
 #pragma mark - MGAGamePieceDelegate Tappable Game Piece Methods
 - (void)tappableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point {
-    
+    [self.view bringSubviewToFront:gamePiece];
 }
 
 - (void)tappableGamePiece:(MGAGamePiece *)gamePiece didDragToPoint:(CGPoint)point {
