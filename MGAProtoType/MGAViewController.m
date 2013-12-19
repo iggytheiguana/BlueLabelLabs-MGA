@@ -7,50 +7,28 @@
 //
 
 #import "MGAViewController.h"
+#import "MGAStages.h"
+#import "MGAStageSteps.h"
 #import "MGAGamePiece.h"
+#import "NSMutableArray+Shuffling.h"
 
 @interface MGAViewController ()
 
 @property (strong, nonatomic) UILabel *lbl_instruction;
-
 @property (strong, nonatomic) UIImageView *iv_map;
-
-@property (strong, nonatomic) UIImageView *iv_japanPlaceholder;
-@property (strong, nonatomic) UIImageView *iv_southKoreaPlaceholder;
-@property (strong, nonatomic) UIImageView *iv_northKoreaPlaceholder;
-
-@property (strong, nonatomic) MGAGamePiece *iv_japanGamePiece;
-@property (strong, nonatomic) MGAGamePiece *iv_southKoreaGamePiece;
-@property (strong, nonatomic) MGAGamePiece *iv_northKoreaGamePiece;
 
 @end
 
 @implementation MGAViewController {
-    // Game Piece Meta Data
-    float _maxDistanceFromCenter;
-    CGPoint _targetPointOnMap;
-    CGPoint _targetPointOfGamePiece;
-    
-    UILabel *_lbl_instruction;
-    
-    // Various frames for map images
-    CGRect _mapFrame;
-    
-    CGRect _southKoreaPlaceholderFrameOnMap;
-    CGRect _northKoreaPlaceholderFrameOnMap;
-    CGRect _japanPlaceholderFrameOnMap;
-    
-    CGRect _southKoreaGamePieceFrameDraggingStep;
-    CGRect _northKoreaGamePieceFrameDraggingStep;
-    CGRect _japanGamePieceFrameDraggingStep;
-    
-    NSMutableArray *_placeholderArray;
-    
-    
-    // NEW
     NSDictionary *_stageDataDictionary;
     NSDictionary *_stageMapDataDictionary;
     NSMutableArray *_gamePieceArray;
+    
+    int _currentStage;
+    int _currentStep;
+    int _currentGamePieceIndex;
+    
+    NSMutableArray *_gamePiecesCompletedInCurrentStep;
 }
 
 - (void)viewDidLoad
@@ -64,8 +42,8 @@
     
     // Now that we have a temporary array of all the stages and data,
     // we grab the stage dictionary we are interested in and setup the properties.
-    int stageIndex = 0;
-    _stageDataDictionary = [temp objectAtIndex:stageIndex];
+    _currentStage = kSTAGE0;
+    _stageDataDictionary = [temp objectAtIndex:_currentStage];
     
     // First setup the map for this stage.
     _stageMapDataDictionary = [_stageDataDictionary objectForKey:@"map"];
@@ -74,6 +52,7 @@
     // Next, setup the game pieces and placeholders for each country.
     NSArray *countries = [_stageDataDictionary objectForKey:@"countries"];
     _gamePieceArray = [[NSMutableArray alloc] initWithCapacity:[countries count]];
+    _gamePiecesCompletedInCurrentStep = [[NSMutableArray alloc] initWithCapacity:[countries count]];
     
     for (NSDictionary *countryDictionary in countries) {
         UIImage *activeImage = [UIImage imageNamed:[countryDictionary objectForKey:@"active_image_filename"]];
@@ -93,6 +72,15 @@
         gamePiece.name = [countryDictionary objectForKey:@"name"];
         gamePiece.scaleStep2 = [[countryDictionary objectForKey:@"scaleStep2"] floatValue];
         gamePiece.maxDistanceFromCenterStep3 = [[countryDictionary objectForKey:@"maxDistanceFromCenterStep3"] floatValue];
+        
+        // Setup the game piece label. We will position it on the screen later.
+        UILabel *gamePieceLabel = [[UILabel alloc] init];
+        [gamePieceLabel setTextAlignment:NSTextAlignmentCenter];
+        [gamePieceLabel setTextColor:[UIColor blackColor]];
+        [gamePieceLabel setFont:[UIFont systemFontOfSize:24.0f]];
+        [gamePieceLabel setText:gamePiece.name];
+        [gamePieceLabel sizeToFit];
+        gamePiece.lbl_name = gamePieceLabel;
         
         // Get the various frames for this game piece
         NSDictionary *frames = [countryDictionary objectForKey:@"frames"];
@@ -130,78 +118,24 @@
         [_gamePieceArray addObject:gamePiece];
     }
     
-    
-//    // Add the image to the image view properties
-//    self.iv_map = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_map.png"]];
-//    
-//    self.iv_southKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_SouthKorea.png"]];
-//    self.iv_northKoreaPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_NorthKorea.png"]];
-//    self.iv_japanPlaceholder = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"stage1_placeholder_Japan.png"]];
-//    
-//    self.iv_southKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_SouthKorea.png"] withPlaceholder:self.iv_southKoreaPlaceholder];
-//    self.iv_southKoreaGamePiece.delegate = self;
-//    self.iv_northKoreaGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_NorthKorea.png"] withPlaceholder:self.iv_northKoreaPlaceholder];
-//    self.iv_northKoreaGamePiece.delegate = self;
-//    self.iv_japanGamePiece = [[MGAGamePiece alloc] initWithImage:[UIImage imageNamed:@"stage1_gamepiece_Japan.png"] withPlaceholder:self.iv_japanPlaceholder];
-//    self.iv_japanGamePiece.delegate = self;
-//    
-//    
-//    // Setup the various frames required for the map pieces for use throughout the stage
-//    _mapFrame = CGRectMake(0.0, 0.0, 754.0, 682.0);
-//    
-//    _southKoreaPlaceholderFrameOnMap = CGRectMake(162.0, 326.0, 117.0, 123.0);
-//    _northKoreaPlaceholderFrameOnMap = CGRectMake(156.0, 219.0, 118.0, 130.0);
-//    _japanPlaceholderFrameOnMap = CGRectMake(129.0, 152.0, 422.0, 484.0);
-//    
-//    _southKoreaGamePieceFrameDraggingStep = CGRectMake(826.0, 151.0, 159.0, 168.0);
-//    _northKoreaGamePieceFrameDraggingStep = CGRectMake(591.0, 469.0, 139.0, 152.0);
-//    _japanGamePieceFrameDraggingStep = CGRectMake(748.0, 397.0, 240.0, 276.0);
-    
-    
-//    // Apply the inital frame for each map piece
-//    self.iv_map.frame = _mapFrame;
-//    
-//    self.iv_southKoreaPlaceholder.frame = _southKoreaPlaceholderFrameOnMap;
-//    self.iv_northKoreaPlaceholder.frame = _northKoreaPlaceholderFrameOnMap;
-//    self.iv_japanPlaceholder.frame = _japanPlaceholderFrameOnMap;
-//    
-//    self.iv_southKoreaGamePiece.frame = _southKoreaGamePieceFrameDraggingStep;
-//    self.iv_northKoreaGamePiece.frame = _northKoreaGamePieceFrameDraggingStep;
-//    self.iv_japanGamePiece.frame = _japanGamePieceFrameDraggingStep;
-//    
-//    _gamePieceArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaGamePiece, self.iv_southKoreaGamePiece, self.iv_japanGamePiece, nil];
-//    _placeholderArray = [[NSArray alloc] initWithObjects:self.iv_northKoreaPlaceholder, self.iv_southKoreaPlaceholder, self.iv_japanPlaceholder, nil];
-//    
-//    // Add the map piece to the view. Order is important because the game pieces need to be on top of other pieces while dragging.
-//    [self.view addSubview:self.iv_map];
-//    
-//    [self.view addSubview:self.iv_southKoreaPlaceholder];
-//    [self.view addSubview:self.iv_northKoreaPlaceholder];
-//    [self.view addSubview:self.iv_japanPlaceholder];
-//    
-//    [self.view addSubview:self.iv_southKoreaGamePiece];
-//    [self.view addSubview:self.iv_northKoreaGamePiece];
-//    [self.view addSubview:self.iv_japanGamePiece];
-    
-    // TODO: TEMP For now i have only programmed the dragging step. The Stage starts with the animated Intro step.
-//    [self setupGamePiecesForDragging];
-    [self setupStep1];
+    // Start with game piece introduction step for this stage.
+    [self setupStep0];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
     // Setup the UILabel for the instruction text.
-    float labelHeight = 80.0f;
+    float labelHeight = 60.0f;
     CGRect labelFrame = CGRectMake(0.0, self.view.bounds.size.height, self.view.bounds.size.width, labelHeight);    // Put the view off the screen to the bottom
     self.lbl_instruction = [[UILabel alloc] initWithFrame:labelFrame];
     [self.lbl_instruction setBackgroundColor:[UIColor colorWithRed:175.0f/255.0f green:235.0f/255.0f blue:254.0f/255.0f alpha:1.0f]];
     [self.lbl_instruction setTextAlignment:NSTextAlignmentCenter];
     [self.lbl_instruction setTextColor:[UIColor whiteColor]];
-    [self.lbl_instruction setFont:[UIFont boldSystemFontOfSize:36.0f]];
+    [self.lbl_instruction setFont:[UIFont systemFontOfSize:36.0f]];
     [self.view addSubview:self.lbl_instruction];
     
-    [self startStep1];
+    [self startStep0];
 }
 
 - (void)didReceiveMemoryWarning
@@ -211,9 +145,9 @@
 }
 
 #pragma mark - Instruction Label Instance Methods
-- (void)showInstructionWithText:(NSString *)text completion:(void (^)(void))completion {
-    // Animate the view into the screen coming up from the bottom, then disappearing again.
-    [self.lbl_instruction setText:text];
+- (void)showInstructionWithText1:(NSString *)text1 withText2:(NSString *)text2 completion:(void (^)(void))completion {
+    // Animate the view into the screen coming up from the bottom.
+    [self.lbl_instruction setText:text1];
     
     float labelHeight = self.lbl_instruction.frame.size.height;
     CGRect labelFrame = CGRectMake(0.0, self.view.bounds.size.height - labelHeight, self.view.bounds.size.width, labelHeight);
@@ -221,25 +155,47 @@
                           delay:0.0
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
-                         _lbl_instruction.frame = labelFrame;
+                         self.lbl_instruction.frame = labelFrame;
                      }
                      completion:^(BOOL finished){
-                         CGRect newFrame = CGRectMake(0.0, self.view.bounds.size.height, self.view.bounds.size.width, labelHeight);
-                         [UIView animateWithDuration:0.7
-                                               delay:5.0
-                                             options:UIViewAnimationOptionCurveEaseInOut
-                                          animations:^{
-                                              _lbl_instruction.frame = newFrame;
-                                          }
-                                          completion:^(BOOL finished){
-                                              if (completion)
-                                                  completion();
-                                          }];
+                         if (text2) {
+                             // Animate the transition of the label text changing from text1 to text2.
+                             CATransition *animation = [CATransition animation];
+                             animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+                             animation.type = kCATransitionFade;
+                             animation.duration = 1.5;
+                             [self.lbl_instruction.layer addAnimation:animation forKey:@"kCATransitionFade"];
+                             [self.lbl_instruction setText:text2];
+                         }
+                         
+                         if (completion) {
+                             completion();
+                         }
                      }];
 }
 
-#pragma mark - Step 1 (Intro) Instance Methods
-- (void)setupStep1 {
+- (void)hideInstructionWithTextWithCompletion:(void (^)(void))completion {
+    // Animate the view off the screen going down to the bottom.
+    float labelHeight = self.lbl_instruction.frame.size.height;
+    CGRect newFrame = CGRectMake(0.0, self.view.bounds.size.height, self.view.bounds.size.width, labelHeight);
+    [UIView animateWithDuration:0.7
+                          delay:5.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.lbl_instruction.frame = newFrame;
+                     }
+                     completion:^(BOOL finished){
+                         if (completion) {
+                             completion();
+                         }
+                     }];
+}
+
+#pragma mark - Step 0 (Intro) Instance Methods
+- (void)setupStep0 {
+    _currentStep = kSTEP0;
+    _currentGamePieceIndex = 0;
+    
     // Apply the inital frame for each map piece
     NSDictionary *mapFrame = [[[_stageDataDictionary objectForKey:@"map"] objectForKey:@"frames"] objectForKey:@"frameStep1"];
     self.iv_map.frame = CGRectMake([[mapFrame objectForKey:@"x"] floatValue],
@@ -267,7 +223,7 @@
 {
     CGPoint originalCenterGamePiece = gamePiece.center;
     
-    [self.lbl_instruction setText:text];
+    [self.lbl_instruction setText:[NSString stringWithFormat:@"This is %@", gamePiece.name]];
     
     float labelHeight = self.lbl_instruction.frame.size.height;
     CGRect newLabelFrame = CGRectMake(0.0, self.view.bounds.size.height - labelHeight, self.view.bounds.size.width, labelHeight);
@@ -288,9 +244,17 @@
                          gamePiece.center = self.view.center;
                          gamePiece.transform = CGAffineTransformScale(gamePiece.transform, scale, scale);
                          
-                         _lbl_instruction.frame = newLabelFrame;
+                         self.lbl_instruction.frame = newLabelFrame;
                      }
                      completion:^(BOOL finished){
+                         // Animate the transition of the label text changing.
+                         CATransition *animation = [CATransition animation];
+                         animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+                         animation.type = kCATransitionFade;
+                         animation.duration = 1.5;
+                         [self.lbl_instruction.layer addAnimation:animation forKey:@"kCATransitionFade"];
+                         [self.lbl_instruction setText:[NSString stringWithFormat:@"%@", gamePiece.name]];
+                         
                          CGRect newLabelFrame = CGRectMake(0.0, self.view.bounds.size.height, self.view.bounds.size.width, labelHeight);
                          
                          [UIView animateWithDuration:0.7
@@ -308,26 +272,31 @@
                                               gamePiece.center = originalCenterGamePiece;
                                               gamePiece.transform = CGAffineTransformIdentity;
                                               
-                                              _lbl_instruction.frame = newLabelFrame;
+                                              self.lbl_instruction.frame = newLabelFrame;
                                           }
                                           completion:^(BOOL finished){
+                                              [_gamePiecesCompletedInCurrentStep addObject:gamePiece];
+                                              
                                               if (completion)
                                                   completion();
                                           }];
                      }];
 }
 
-- (void)startStep1 {
+- (void)startStep0 {
     // For every game piece we create a completion block that will instruct
     // the viewController to introduce the next game piece.
     // The last game piece has no completion handler.
     
-    int gamePieceCount = [_gamePieceArray count];
+    int gamePieceCount = (int)[_gamePieceArray count];
     
     NSMutableArray *completionBlocks = [[NSMutableArray alloc] initWithCapacity:gamePieceCount];
     
     void (^lastBlock)(void) = ^(void) {
-        [self endStep1];
+        void (^completion)(void) = ^(void) {
+            [self endStep0];
+        };
+        [self hideInstructionWithTextWithCompletion:completion];
     };
     [completionBlocks addObject:lastBlock];
     
@@ -335,10 +304,14 @@
     for (int i = gamePieceCount - 1; i > 0; i--) {
         MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
         void (^completionBlock)(void) = ^(void) {
-            [self introduceGamePiece:gamePiece
-                           withScale:gamePiece.scaleStep2
-                            withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
-                          completion:[completionBlocks objectAtIndex:blockIndex]];
+            void (^completion)(void) = ^(void) {
+                _currentGamePieceIndex++;
+                [self introduceGamePiece:gamePiece
+                               withScale:gamePiece.scaleStep2
+                                withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
+                              completion:[completionBlocks objectAtIndex:blockIndex]];
+            };
+            [self hideInstructionWithTextWithCompletion:completion];
         };
         
         [completionBlocks addObject:completionBlock];
@@ -347,15 +320,16 @@
     NSArray* reversedCompletionBlocks = [[completionBlocks reverseObjectEnumerator] allObjects];
     
     // We start with the first game piece in the stage. We hide the map at the same time.
-    MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:0];
+    _currentGamePieceIndex = 0;
+    MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:_currentGamePieceIndex];
     [self introduceGamePiece:gamePiece
                    withScale:gamePiece.scaleStep2
                     withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
                   completion:[reversedCompletionBlocks objectAtIndex:0]];
 }
 
-- (void)endStep1 {
-    // Fade out the current view to prepare fro step 2.
+- (void)endStep0 {
+    // Fade out the current view to prepare for step 1.
     [UIView animateWithDuration:0.35
                           delay:1.0
                         options:UIViewAnimationOptionCurveEaseInOut
@@ -368,16 +342,22 @@
                          }
                      }
                      completion:^(BOOL finished){
-                         [self startStep2];
+                         [self startStep1];
                      }];
 }
 
-#pragma mark - Step 2 (Taping - No Map) Instance Methods
-- (void)startStep2 {
+#pragma mark - Step 1 (Taping - No Map) Instance Methods
+- (void)startStep1 {
+    _currentStep = kSTEP1;
+    _currentGamePieceIndex = 0;
+    
+    // First empty the array that tracks which game pieces have been completed for this step.
+    [_gamePiecesCompletedInCurrentStep removeAllObjects];
+    
     // Move the game pieces to the top off the screen, off the screen
     // so they can drop into place to begin the next step.
     
-    int gamePieceCount = [_gamePieceArray count];
+    int gamePieceCount = (int)[_gamePieceArray count];
     
     // TODO: Layout currently only supports 1 row of pieces. Need a more scalable solution for when 3+ pieces are shown.
     for (int i = 0; i < gamePieceCount; i++) {
@@ -389,6 +369,25 @@
         [gamePiece setUserInteractionEnabled:NO];
     }
     
+    // Get all the centers of the game pieces.
+    NSMutableArray *tempGamePieceCentersArray = [[NSMutableArray alloc] initWithCapacity:gamePieceCount];
+    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+        [tempGamePieceCentersArray addObject:[NSValue valueWithCGPoint:gamePiece.center]];
+    }
+    
+    // Next, shuffle the centers array randomly.
+    [tempGamePieceCentersArray shuffle];
+    
+    // Now apply the shuffled centers to each game piece.
+    for (int i = 0; i < gamePieceCount; i++) {
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
+        
+        CGPoint newCenter = [[tempGamePieceCentersArray objectAtIndex:i] CGPointValue];
+        
+        gamePiece.center = newCenter;
+    }
+    
+    // Now we let the game pieces drop down into the screen form the top.
     for (int i = 0; i < gamePieceCount; i++) {
         MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
         CGPoint center = CGPointMake(gamePiece.center.x, self.view.bounds.size.height/2);
@@ -397,12 +396,57 @@
         [gamePiece performSelector:@selector(setUserInteractionEnabled:) withObject:[NSNumber numberWithBool:YES] afterDelay:2.0];
     }
     
-    // TODO: Randomize step 2 and shuffle until all countries are identified.
-    [self showInstructionWithText:@"Show me South Korea" completion:nil];
+    // Start with the first game piece in this stage.
+    _currentGamePieceIndex = 0;
+    MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:_currentGamePieceIndex];
+    void (^completion)(void) = ^(void) {
+        [self.lbl_instruction setText:gamePiece.name];
+    };
+    [self showInstructionWithText1:[NSString stringWithFormat:@"Show me %@", gamePiece.name] withText2:[NSString stringWithFormat:@"%@", gamePiece.name] completion:completion];
 }
 
-#pragma mark - Step 3 (Dragging - On Map) Instance Methods
-- (void)startStep3 {
+- (void)shuffleStep1 {
+    int gamePieceCount = (int)[_gamePieceArray count];
+    
+    // Get all the centers of the game pieces.
+    NSMutableArray *tempGamePieceCentersArray = [[NSMutableArray alloc] initWithCapacity:gamePieceCount];
+    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+        [tempGamePieceCentersArray addObject:[NSValue valueWithCGPoint:gamePiece.center]];
+    }
+    
+    // Next, shuffle the centers array randomly.
+    [tempGamePieceCentersArray shuffle];
+    
+    // Now apply the shuffled centers to each game piece.
+    for (int i = 0; i < gamePieceCount; i++) {
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
+        
+        CGPoint newCenter = [[tempGamePieceCentersArray objectAtIndex:i] CGPointValue];
+        
+        [gamePiece makeGamePieceTappableWithCenter:newCenter];
+    }
+    
+//    // Now randomly select one of the centers and apply it to a differnt game piece.
+//    for (MGAGamePiece *gamePiece in _gamePieceArray) {
+//        int gamePieceCenterIndex = arc4random_uniform([tempGamePieceCentersArray count]);
+//        
+//        CGPoint newCenter = [[tempGamePieceCentersArray objectAtIndex:gamePieceCenterIndex] CGPointValue];
+//        
+//        [gamePiece makeGamePieceTappableWithCenter:newCenter];
+//        
+//        // Remove this center point form the array of available centers.
+//        [tempGamePieceCentersArray removeObjectAtIndex:gamePieceCenterIndex];
+//    }
+}
+
+#pragma mark - Step 2 (Dragging - On Map) Instance Methods
+- (void)startStep2 {
+    _currentStep = kSTEP2;
+    _currentGamePieceIndex = 0;
+    
+    // First empty the array that tracks which game pieces have been completed for this step.
+    [_gamePiecesCompletedInCurrentStep removeAllObjects];
+    
     // Setup game pieces for dragging step and move them to their starting location on the screen.
     [UIView animateWithDuration:0.7
                           delay:0.0
@@ -424,7 +468,30 @@
                      completion:^(BOOL finished){
                          [self setupGamePiecesForDragging];
                          
-                         [self showInstructionWithText:@"Show me where these go" completion:nil];
+                         // Show the game piece labels under each game piece.
+                         // Position the gamepiece label and show it.
+                         for (MGAGamePiece *gamePiece in _gamePieceArray) {
+                             CGPoint labeCenter = CGPointMake(gamePiece.center.x, gamePiece.center.y + gamePiece.frame.size.height/2 + 15.0);
+                             gamePiece.lbl_name.center = labeCenter;
+                             gamePiece.lbl_name.alpha = 0.0;
+                             
+                             [self.view addSubview:gamePiece.lbl_name];
+                         }
+                         
+                         [UIView animateWithDuration:0.35
+                                               delay:0.0
+                                             options:UIViewAnimationOptionCurveEaseInOut
+                                          animations:^{
+                                              for (MGAGamePiece *gamePiece in _gamePieceArray) {
+                                                  gamePiece.lbl_name.alpha = 1.0;
+                                              }
+                                          }
+                                          completion:^(BOOL finished){
+                                              void (^completion)(void) = ^(void) {
+                                                  [self hideInstructionWithTextWithCompletion:nil];
+                                              };
+                                              [self showInstructionWithText1:@"Show me where these go" withText2:nil completion:completion];
+                                          }];
                      }];
 }
 
@@ -434,9 +501,14 @@
     }
 }
 
-
-#pragma mark - Step 4 (Taping - On Map) Instance Methods
-- (void)startStep4 {
+#pragma mark - Step 3 (Taping - On Map) Instance Methods
+- (void)startStep3 {
+    _currentStep = kSTEP3;
+    _currentGamePieceIndex = 0;
+    
+    // First empty the array that tracks which game pieces have been completed for this step.
+    [_gamePiecesCompletedInCurrentStep removeAllObjects];
+    
     // Game pieces should now be in their proper postions on the map.
     // Make them tappable for this step.
     
@@ -447,9 +519,56 @@
         [gamePiece setUserInteractionEnabled:YES];
     }
     
-    [self showInstructionWithText:@"Show me South Korea" completion:nil];
+    // Start with the first game piece in this stage.
+    MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:_currentGamePieceIndex];
+    void (^completion)(void) = ^(void) {
+        [self.lbl_instruction setText:gamePiece.name];
+    };
+    [self showInstructionWithText1:[NSString stringWithFormat:@"Show me %@", gamePiece.name] withText2:[NSString stringWithFormat:@"%@", gamePiece.name] completion:completion];
 }
 
+#pragma mark - MGAGamePieceDelegate Game Piece Methods
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    // We need to test to see if the touch if within another game pieces frame below this one.
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.view];
+    
+    for (MGAGamePiece *otherGamePiece in _gamePieceArray) {
+        if (otherGamePiece != gamePiece &&
+            CGRectContainsPoint(otherGamePiece.frame, touchLocation))
+        {
+            [otherGamePiece touchesBegan:touches withEvent:event];
+        }
+    }
+}
+
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    // We need to test to see if the touch if within another game pieces frame below this one.
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.view];
+    
+    for (MGAGamePiece *otherGamePiece in _gamePieceArray) {
+        if (otherGamePiece != gamePiece &&
+            CGRectContainsPoint(otherGamePiece.frame, touchLocation))
+        {
+            [otherGamePiece touchesMoved:touches withEvent:event];
+        }
+    }
+}
+
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    // We need to test to see if the touch if within another game pieces frame below this one.
+    UITouch *touch = [[event allTouches] anyObject];
+    CGPoint touchLocation = [touch locationInView:self.view];
+    
+    for (MGAGamePiece *otherGamePiece in _gamePieceArray) {
+        if (otherGamePiece != gamePiece &&
+            CGRectContainsPoint(otherGamePiece.frame, touchLocation))
+        {
+            [otherGamePiece touchesEnded:touches withEvent:event];
+        }
+    }
+}
 
 #pragma mark - MGAGamePieceDelegate Draggable Game Piece Methods
 - (void)draggableGamePieceTouchBegan:(MGAGamePiece *)gamePiece didTouchAtPoint:(CGPoint)point {
@@ -473,10 +592,6 @@
         
         // Disable further interation with the game piece
         [gamePiece setUserInteractionEnabled:NO];
-        
-        if ([gamePiece.name isEqualToString:@"South Korea"]) {
-            [self startStep4];
-        }
     }
     else {
         [gamePiece returnGamePieceToOriginalLocation];
@@ -484,7 +599,14 @@
 }
 
 - (void)gamePiecePlacedOnTarget:(MGAGamePiece *)gamePiece {
-    [self startStep4];
+    if (_currentStep == kSTEP2) {
+        [_gamePiecesCompletedInCurrentStep addObject:gamePiece];
+        
+        // Check to see if all game pieces have been correctly placed on the map.
+        if ([_gamePiecesCompletedInCurrentStep count] == [_gamePieceArray count]) {
+            [self startStep3];
+        }
+    }
 }
 
 - (void)gamePieceReturnedToOriginalLocation:(MGAGamePiece *)gamePiece {
@@ -501,8 +623,10 @@
 }
 
 - (void)tappableGamePiece:(MGAGamePiece *)gamePiece didReleaseAtPoint:(CGPoint)point {
-    if ([gamePiece.name isEqualToString:@"South Korea"]) {
+    if ([_gamePieceArray objectAtIndex:_currentGamePieceIndex] == gamePiece) {
         [gamePiece bounceGamePiece];
+        
+        [self hideInstructionWithTextWithCompletion:nil];
     }
     else {
         [gamePiece shakeGamePiece];
@@ -510,11 +634,43 @@
 }
 
 - (void)gamePieceBounceDidComplete:(MGAGamePiece *)gamePiece {
-    [self startStep3];
+    [_gamePiecesCompletedInCurrentStep addObject:gamePiece];
+    
+    // Check to see if all game pieces have been correctly identified.
+    if ([_gamePiecesCompletedInCurrentStep count] == [_gamePieceArray count]) {
+        if (_currentStep == kSTEP1) {
+            [self startStep2];
+        }
+        else if (_currentStep == kSTEP3) {
+            // Stage complete.
+            void (^completion)(void) = ^(void) {
+                void (^completion)(void) = ^(void) {
+                    [self.navigationController popViewControllerAnimated:YES];
+                };
+                [self hideInstructionWithTextWithCompletion:completion];
+            };
+            [self showInstructionWithText1:@"Stage complete!" withText2:nil completion:completion];
+        }
+    }
+    else {
+        if (_currentStep == kSTEP1) {
+            [self shuffleStep1];
+        }
+        
+        // Get the next game piece for the user to identify.
+        _currentGamePieceIndex++;
+        MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:_currentGamePieceIndex];
+        void (^completion)(void) = ^(void) {
+            [self.lbl_instruction setText:gamePiece.name];
+        };
+        [self showInstructionWithText1:[NSString stringWithFormat:@"Show me %@", gamePiece.name] withText2:[NSString stringWithFormat:@"%@", gamePiece.name] completion:completion];
+    }
 }
 
 - (void)gamePieceShakeDidComplete:(MGAGamePiece *)gamePiece {
-    
+    if (_currentStep == kSTEP1) {
+        [self shuffleStep1];
+    }
 }
 
 #pragma mark - Navigation Methods

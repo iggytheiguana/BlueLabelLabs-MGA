@@ -24,6 +24,10 @@
 - (void)gamePieceBounceDidComplete:(MGAGamePiece *)gamePiece;
 - (void)gamePieceShakeDidComplete:(MGAGamePiece *)gamePiece;
 
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)gamePieceDidTouchTransparentPixel:(MGAGamePiece *)gamePiece touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
+
 @end
 
 @interface MGAGamePiece : UIImageView < UIGestureRecognizerDelegate, UIDynamicAnimatorDelegate > {
@@ -31,9 +35,7 @@
     UISnapBehavior *_snapBehavior;
     UIAttachmentBehavior *_touchAttachmentBehavior;
     
-//    CGRect _originalFrame;
     CGPoint _originalCenter;
-    
     CGPoint _startLocation;
     
     BOOL _didTouchTransparentPixel;
@@ -51,6 +53,7 @@
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, assign) float scaleStep2;
 @property (nonatomic, assign) float maxDistanceFromCenterStep3;
+@property (nonatomic, strong) UILabel *lbl_name;
 @property (nonatomic, strong) UIImage *image_placeholder;
 @property (nonatomic, strong) UIImage *image_active;
 @property (nonatomic, strong) UIImage *image_inactive;
@@ -69,6 +72,5 @@
 - (void)placeGamePieceOnMapTarget:(BOOL)animated;
 - (void)shakeGamePiece;
 - (void)bounceGamePiece;
-- (void)reset;
 
 @end

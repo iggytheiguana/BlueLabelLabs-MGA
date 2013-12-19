@@ -48,7 +48,6 @@
     self.draggable = YES;
     self.tappable = NO;
     
-//    _originalFrame = self.frame;
     _originalCenter = self.center;
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
@@ -62,7 +61,6 @@
     self.tappable = YES;
     self.draggable = NO;
     
-//    _originalFrame = self.frame;
     _originalCenter = center;
     
     _animator = [[UIDynamicAnimator alloc] initWithReferenceView:self.referenceView];
@@ -81,6 +79,10 @@
     // Only accept the touch if it is on a non transparent pixel of the image
     if ([self isTouchOnTransparentPixel:[touch locationInView:self]]) {
         _didTouchTransparentPixel = YES;
+        
+        // We need to pass the touch through to the next responder incase
+        // there is another game piece within this transparent area.
+        [self.delegate gamePieceDidTouchTransparentPixel:self touchesBegan:touches withEvent:event];
         return;
     }
     else {
@@ -97,8 +99,10 @@
 {
     [super touchesMoved:touches withEvent:event];
     
-    if (_didTouchTransparentPixel)
-        return;
+    if (_didTouchTransparentPixel) {
+        [self.delegate gamePieceDidTouchTransparentPixel:self touchesMoved:touches withEvent:event];
+         return;
+    }
     
     if (self.draggable)
         [self draggableGamePieceTouchesMoved:touches withEvent:event];
@@ -110,8 +114,10 @@
 {
     [super touchesEnded:touches withEvent:event];
     
-    if (_didTouchTransparentPixel)
+    if (_didTouchTransparentPixel) {
+        [self.delegate gamePieceDidTouchTransparentPixel:self touchesEnded:touches withEvent:event];
         return;
+    }
     
     if (self.draggable)
         [self draggableGamePieceTouchesEnded:touches withEvent:event];
@@ -146,6 +152,30 @@
 }
 
 #pragma mark - Common Instance Methods
+- (void)hideLabel {
+    [UIView animateWithDuration:0.35
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.lbl_name.alpha = 0.0;
+                     }
+                     completion:^(BOOL finished){
+                         
+                     }];
+}
+
+- (void)showLabel {
+    [UIView animateWithDuration:0.35
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.lbl_name.alpha = 1.0;
+                     }
+                     completion:^(BOOL finished){
+                         
+                     }];
+}
+
 - (BOOL)isTouchOnTransparentPixel:(CGPoint)point {
     unsigned char pixel[4] = {0};
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -250,7 +280,6 @@
                         options:UIViewAnimationOptionCurveEaseInOut
                      animations:^{
                          self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -20.0f);
-//                         self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -20.0f);
                      }
                      completion:^(BOOL finished){
                          [UIView animateWithDuration:0.125
@@ -258,7 +287,6 @@
                                              options:UIViewAnimationOptionCurveEaseInOut
                                           animations:^{
                                               self.transform = CGAffineTransformTranslate(self.transform, 0.0f, 40.0f);
-//                                              self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, 40.0f);
                                           }
                                           completion:^(BOOL finished){
                                               [UIView animateWithDuration:0.125
@@ -266,7 +294,6 @@
                                                                   options:UIViewAnimationOptionCurveEaseInOut
                                                                animations:^{
                                                                    self.transform = CGAffineTransformTranslate(self.transform, 0.0f, -40.0f);
-//                                                                   self.placeholder.transform = CGAffineTransformTranslate(self.placeholder.transform, 0.0f, -40.0f);
                                                                }
                                                                completion:^(BOOL finished){
                                                                    [UIView animateWithDuration:0.125
@@ -274,7 +301,6 @@
                                                                                        options:UIViewAnimationOptionCurveEaseInOut
                                                                                     animations:^{
                                                                                         self.transform = CGAffineTransformIdentity;
-//                                                                                        self.placeholder.transform = CGAffineTransformIdentity;
                                                                                     }
                                                                                     completion:^(BOOL finished){
                                                                                         self.image = self.image_active;
@@ -294,6 +320,9 @@
         
     // Make the piece slightly transparent
     [self makeTransparent:YES];
+    
+    // Hide the label
+    [self hideLabel];
     
     [_animator removeAllBehaviors];
     
@@ -353,6 +382,11 @@
     
     _snapBehavior = [[UISnapBehavior alloc] initWithItem:self snapToPoint:_originalCenter];
     [_animator addBehavior:_snapBehavior];
+    
+    // Show the label
+    [self showLabel];
+    
+    [self.delegate gamePieceReturnedToOriginalLocation:self];
 }
 
 - (void)placeGamePieceOnMapTarget:(BOOL)animated {
@@ -372,6 +406,8 @@
                              self.placeholder.alpha = 0.0;
                              
                              [_animator removeAllBehaviors];
+                             
+                             [self.delegate gamePiecePlacedOnTarget:self];
                          }];
     }
     else {
@@ -383,6 +419,8 @@
         self.placeholder.alpha = 0.0;
         
         [_animator removeAllBehaviors];
+        
+        [self.delegate gamePiecePlacedOnTarget:self];
     }
 }
 
@@ -413,16 +451,5 @@
     // Tell the view controller that the game piece has been released
     [self.delegate tappableGamePiece:self didReleaseAtPoint:touchLocation];
 }
-
-//#pragma mark - TEMP Methods
-//- (void)reset {
-//    [_animator removeAllBehaviors];
-//    _isScaled = NO;
-//    [self zoomGamePieceOut];
-//    
-//    self.frame = _originalFrame;
-//    
-//    self.userInteractionEnabled = YES;
-//}
 
 @end
