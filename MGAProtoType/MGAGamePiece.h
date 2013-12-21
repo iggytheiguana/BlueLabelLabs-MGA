@@ -51,18 +51,18 @@
 
 // Game Piece Properties From Dictionary
 @property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) float scaleStep2;
-@property (nonatomic, assign) float maxDistanceFromCenterStep3;
+@property (nonatomic, assign) float scaleStep0;
+@property (nonatomic, assign) float maxDistanceFromCenterStep2;
 @property (nonatomic, strong) UILabel *lbl_name;
 @property (nonatomic, strong) UIImage *image_placeholder;
 @property (nonatomic, strong) UIImage *image_active;
 @property (nonatomic, strong) UIImage *image_inactive;
 @property (nonatomic, strong) UIImageView *placeholder;
+@property (nonatomic) CGRect frameStep0;
 @property (nonatomic) CGRect frameStep1;
-@property (nonatomic) CGRect frameStep2;
-@property (nonatomic) CGRect frameStep3Placeholder;
-@property (nonatomic) CGRect frameStep3GamePiece;
-@property (nonatomic) CGRect frameStep4;
+@property (nonatomic) CGRect frameStep2Placeholder;
+@property (nonatomic) CGRect frameStep2GamePiece;
+@property (nonatomic) CGRect frameStep3;
 
 - (id)initWithFrame:(CGRect)frame;
 - (id)initWithImage:(UIImage *)image;

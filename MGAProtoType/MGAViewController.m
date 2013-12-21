@@ -70,8 +70,8 @@
         gamePiece.image_placeholder = placeholderImage;
         
         gamePiece.name = [countryDictionary objectForKey:@"name"];
-        gamePiece.scaleStep2 = [[countryDictionary objectForKey:@"scaleStep2"] floatValue];
-        gamePiece.maxDistanceFromCenterStep3 = [[countryDictionary objectForKey:@"maxDistanceFromCenterStep3"] floatValue];
+        gamePiece.scaleStep0 = [[countryDictionary objectForKey:@"scaleStep0"] floatValue];
+        gamePiece.maxDistanceFromCenterStep2 = [[countryDictionary objectForKey:@"maxDistanceFromCenterStep2"] floatValue];
         
         // Setup the game piece label. We will position it on the screen later.
         UILabel *gamePieceLabel = [[UILabel alloc] init];
@@ -85,35 +85,35 @@
         // Get the various frames for this game piece
         NSDictionary *frames = [countryDictionary objectForKey:@"frames"];
         
+        NSDictionary *frameStep0 = [frames objectForKey:@"frameStep0"];
+        gamePiece.frameStep0 = CGRectMake([[frameStep0 objectForKey:@"x"] floatValue],
+                                       [[frameStep0 objectForKey:@"y"] floatValue],
+                                       [[frameStep0 objectForKey:@"width"] floatValue],
+                                       [[frameStep0 objectForKey:@"height"] floatValue]);
+        
         NSDictionary *frameStep1 = [frames objectForKey:@"frameStep1"];
         gamePiece.frameStep1 = CGRectMake([[frameStep1 objectForKey:@"x"] floatValue],
-                                       [[frameStep1 objectForKey:@"y"] floatValue],
-                                       [[frameStep1 objectForKey:@"width"] floatValue],
-                                       [[frameStep1 objectForKey:@"height"] floatValue]);
+                                          [[frameStep1 objectForKey:@"y"] floatValue],
+                                          [[frameStep1 objectForKey:@"width"] floatValue],
+                                          [[frameStep1 objectForKey:@"height"] floatValue]);
         
-        NSDictionary *frameStep2 = [frames objectForKey:@"frameStep2"];
-        gamePiece.frameStep2 = CGRectMake([[frameStep2 objectForKey:@"x"] floatValue],
-                                          [[frameStep2 objectForKey:@"y"] floatValue],
-                                          [[frameStep2 objectForKey:@"width"] floatValue],
-                                          [[frameStep2 objectForKey:@"height"] floatValue]);
+        NSDictionary *frameStep2Placeholder = [frames objectForKey:@"frameStep2Placeholder"];
+        gamePiece.frameStep2Placeholder = CGRectMake([[frameStep2Placeholder objectForKey:@"x"] floatValue],
+                                          [[frameStep2Placeholder objectForKey:@"y"] floatValue],
+                                          [[frameStep2Placeholder objectForKey:@"width"] floatValue],
+                                          [[frameStep2Placeholder objectForKey:@"height"] floatValue]);
         
-        NSDictionary *frameStep3Placeholder = [frames objectForKey:@"frameStep3Placeholder"];
-        gamePiece.frameStep3Placeholder = CGRectMake([[frameStep3Placeholder objectForKey:@"x"] floatValue],
-                                          [[frameStep3Placeholder objectForKey:@"y"] floatValue],
-                                          [[frameStep3Placeholder objectForKey:@"width"] floatValue],
-                                          [[frameStep3Placeholder objectForKey:@"height"] floatValue]);
+        NSDictionary *frameStep2GamePiece = [frames objectForKey:@"frameStep2GamePiece"];
+        gamePiece.frameStep2GamePiece = CGRectMake([[frameStep2GamePiece objectForKey:@"x"] floatValue],
+                                          [[frameStep2GamePiece objectForKey:@"y"] floatValue],
+                                          [[frameStep2GamePiece objectForKey:@"width"] floatValue],
+                                          [[frameStep2GamePiece objectForKey:@"height"] floatValue]);
         
-        NSDictionary *frameStep3GamePiece = [frames objectForKey:@"frameStep3GamePiece"];
-        gamePiece.frameStep3GamePiece = CGRectMake([[frameStep3GamePiece objectForKey:@"x"] floatValue],
-                                          [[frameStep3GamePiece objectForKey:@"y"] floatValue],
-                                          [[frameStep3GamePiece objectForKey:@"width"] floatValue],
-                                          [[frameStep3GamePiece objectForKey:@"height"] floatValue]);
-        
-        NSDictionary *frameStep4 = [frames objectForKey:@"frameStep4"];
-        gamePiece.frameStep4 = CGRectMake([[frameStep4 objectForKey:@"x"] floatValue],
-                                          [[frameStep4 objectForKey:@"y"] floatValue],
-                                          [[frameStep4 objectForKey:@"width"] floatValue],
-                                          [[frameStep4 objectForKey:@"height"] floatValue]);
+        NSDictionary *frameStep3 = [frames objectForKey:@"frameStep3"];
+        gamePiece.frameStep3 = CGRectMake([[frameStep3 objectForKey:@"x"] floatValue],
+                                          [[frameStep3 objectForKey:@"y"] floatValue],
+                                          [[frameStep3 objectForKey:@"width"] floatValue],
+                                          [[frameStep3 objectForKey:@"height"] floatValue]);
         
         [_gamePieceArray addObject:gamePiece];
     }
@@ -197,7 +197,7 @@
     _currentGamePieceIndex = 0;
     
     // Apply the inital frame for each map piece
-    NSDictionary *mapFrame = [[[_stageDataDictionary objectForKey:@"map"] objectForKey:@"frames"] objectForKey:@"frameStep1"];
+    NSDictionary *mapFrame = [[[_stageDataDictionary objectForKey:@"map"] objectForKey:@"frames"] objectForKey:@"frameStep0"];
     self.iv_map.frame = CGRectMake([[mapFrame objectForKey:@"x"] floatValue],
                                    [[mapFrame objectForKey:@"y"] floatValue],
                                    [[mapFrame objectForKey:@"width"] floatValue],
@@ -207,8 +207,8 @@
     // Apply the frame for step 1 for each game piece
     for (MGAGamePiece *gamePiece in _gamePieceArray) {
         gamePiece.image = gamePiece.image_inactive;
-        gamePiece.frame = gamePiece.frameStep1;
-        gamePiece.placeholder.frame = gamePiece.frameStep1;
+        gamePiece.frame = gamePiece.frameStep0;
+        gamePiece.placeholder.frame = gamePiece.frameStep0;
         gamePiece.placeholder.alpha = 0.0;
         
         [self.view addSubview:gamePiece];
@@ -309,7 +309,7 @@
             void (^completion)(void) = ^(void) {
                 _currentGamePieceIndex++;
                 [self introduceGamePiece:gamePiece
-                               withScale:gamePiece.scaleStep2
+                               withScale:gamePiece.scaleStep0
                                 withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
                               completion:[completionBlocks objectAtIndex:blockIndex]];
             };
@@ -325,7 +325,7 @@
     _currentGamePieceIndex = 0;
     MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:_currentGamePieceIndex];
     [self introduceGamePiece:gamePiece
-                   withScale:gamePiece.scaleStep2
+                   withScale:gamePiece.scaleStep0
                     withText:[NSString stringWithFormat:@"This is %@", gamePiece.name]
                   completion:[reversedCompletionBlocks objectAtIndex:0]];
 }
@@ -365,7 +365,7 @@
     for (int i = 0; i < gamePieceCount; i++) {
         MGAGamePiece *gamePiece = [_gamePieceArray objectAtIndex:i];
         gamePiece.image = gamePiece.image_active;
-        gamePiece.frame = gamePiece.frameStep2;
+        gamePiece.frame = gamePiece.frameStep1;
         gamePiece.center = CGPointMake((i+i+1)*(self.view.bounds.size.width / (2*gamePieceCount)), -(self.view.bounds.size.height/2));
         gamePiece.alpha = 1.0f;
         [gamePiece setUserInteractionEnabled:NO];
@@ -461,8 +461,8 @@
                              gamePiece.alpha = 1.0f;
                              gamePiece.placeholder.alpha = 1.0f;
                              
-                             gamePiece.frame = gamePiece.frameStep3GamePiece;
-                             gamePiece.placeholder.frame = gamePiece.frameStep3Placeholder;
+                             gamePiece.frame = gamePiece.frameStep2GamePiece;
+                             gamePiece.placeholder.frame = gamePiece.frameStep2Placeholder;
                              
                              [self.view bringSubviewToFront:gamePiece];
                          }
@@ -585,7 +585,7 @@
     CGPoint p1 = gamePiece.placeholder.center;
     CGPoint p2 = gamePiece.center;
     
-    CGFloat targetDistance = gamePiece.maxDistanceFromCenterStep3;
+    CGFloat targetDistance = gamePiece.maxDistanceFromCenterStep2;
     
     CGFloat distanceCenters = hypotf(p1.x - p2.x, p1.y - p2.y);
     
