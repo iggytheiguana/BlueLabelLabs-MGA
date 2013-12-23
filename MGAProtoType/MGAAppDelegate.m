@@ -13,6 +13,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    
+    // Get the current locale country code of this device to determine which version of the world map to show during the intro.
+    NSString *countryCode = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
+    NSLog(@"localeCountryCode: %@", countryCode);
+    
     return YES;
 }
 							

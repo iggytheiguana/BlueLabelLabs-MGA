@@ -40,8 +40,8 @@
     NSString* plistsource = [[NSBundle mainBundle] pathForResource:@"MGAPropertyList" ofType:@"plist"];
     NSArray *temp = [NSArray arrayWithContentsOfFile:plistsource];
     
-    // Now that we have a temporary array of all the stages and data,
-    // we grab the stage dictionary we are interested in and setup the properties.
+    // Now that we have a temporary array of all the stages and data, we
+    // get the stage dictionary we are interested in and setup the properties.
     _currentStage = kSTAGE0;
     _stageDataDictionary = [temp objectAtIndex:_currentStage];
     
@@ -51,14 +51,15 @@
     
     // Next, setup the game pieces and placeholders for each country.
     NSArray *countries = [_stageDataDictionary objectForKey:@"countries"];
-    _gamePieceArray = [[NSMutableArray alloc] initWithCapacity:[countries count]];
-    _gamePiecesCompletedInCurrentStep = [[NSMutableArray alloc] initWithCapacity:[countries count]];
+    _gamePieceArray = [[NSMutableArray alloc] initWithCapacity:[countries count]]; // This array will hold a pointer to all game piece objects used during this stage.
+    _gamePiecesCompletedInCurrentStep = [[NSMutableArray alloc] initWithCapacity:[countries count]]; // Used to track which game pieces have been successfully completed during each step.
     
     for (NSDictionary *countryDictionary in countries) {
         UIImage *activeImage = [UIImage imageNamed:[countryDictionary objectForKey:@"active_image_filename"]];
         UIImage *inactiveImage = [UIImage imageNamed:[countryDictionary objectForKey:@"inactive_image_filename"]];
         UIImage *placeholderImage = [UIImage imageNamed:[countryDictionary objectForKey:@"placeholder_image_filename"]];
         
+        // Create the game piece object.
         MGAGamePiece *gamePiece = [[MGAGamePiece alloc] initWithImage:inactiveImage];
         gamePiece.delegate = self;
         
